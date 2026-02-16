@@ -1,0 +1,135 @@
+generator client {
+  provider = "prisma-client-js"
+
+}
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+
+enum RoleType {
+  FARMER
+  PROVIDER
+  ADMIN
+}
+
+enum ServiceRequestStatus {
+  SUBMITTED
+  APPROVED
+  REJECTED
+  ASSIGNED
+  ACCEPTED
+  IN_PROGRESS
+  COMPLETED
+}
+
+enum SlotType {
+  MORNING
+  AFTERNOON
+  EVENING
+}
+
+model Crop {
+  id        Int   @id @default(autoincrement())
+  name      String   @db.VarChar(100)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  farms     Farm[]
+}
+
+model ServiceCategory {
+  id          Int   @id @default(autoincrement())
+  name        String   @db.VarChar(120)     
+  price       Decimal?                      
+  image       String?  @db.Text
+  description String?  @db.Text
+  unit        String?                       
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  requests    ServiceRequest[]
+}
+
+
+model User {
+  id           Int        @id @default(autoincrement())
+  role         RoleType
+  name         String?
+  mobile       String?       @unique
+  email        String?       @unique
+  password     String?                    
+  isActive     Boolean       @default(true)
+  address      String?
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+
+  locations    UserLocation[]
+  farms        Farm[]
+  sentRequests ServiceRequest[] @relation("FarmerToRequest")
+  receivedJobs ServiceRequest[] @relation("ProviderToRequest")
+}
+
+model Otp {
+  id        Int   @id @default(autoincrement())
+  mobile    String   
+  code      String?
+  expiresAt DateTime?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+
+model UserLocation {
+  id        Int   @id @default(autoincrement())
+  userId    Int
+  latitude  String
+  longitude String
+  label     String?               
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user      User     @relation(fields: [userId], references: [id])
+}
+
+model Farm {
+  id          Int   @id @default(autoincrement())
+  userId      Int
+  name        String                
+  area        Decimal?             
+  cropId      Int?
+  latitude    String?
+  longitude   String?
+  address     String?
+  surveyNo    String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  crop        Crop?    @relation(fields: [cropId], references: [id])
+  user        User     @relation(fields: [userId], references: [id])
+}
+
+
+
+model ServiceRequest {
+  id                Int              @id @default(autoincrement())
+  farmerId          Int
+  serviceCategoryId Int
+  providerId        Int?
+  status            ServiceRequestStatus @default(SUBMITTED)
+  details           String?                        
+  visitReport       String?                        
+  finalNotes        String?                        
+  preferredSlot     SlotType?                      
+  appliedAt         DateTime            @default(now())
+  approvedAt        DateTime?
+  assignedAt        DateTime?
+  acceptedAt        DateTime?
+  completedAt       DateTime?
+  updatedAt         DateTime            @updatedAt
+
+  farmer            User                @relation("FarmerToRequest", fields: [farmerId], references: [id])
+  provider          User?               @relation("ProviderToRequest", fields: [providerId], references: [id])
+  category          ServiceCategory     @relation(fields: [serviceCategoryId], references: [id])
+}
