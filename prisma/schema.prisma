@@ -8,11 +8,7 @@ datasource db {
 }
 
 
-enum RoleType {
-  FARMER
-  PROVIDER
-  ADMIN
-}
+
 
 enum ServiceRequestStatus {
   SUBMITTED
@@ -29,6 +25,16 @@ enum SlotType {
   AFTERNOON
   EVENING
 }
+
+model Role {
+  id        Int      @id @default(autoincrement())
+  name      String   @unique
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  users     User[]
+}
+
 
 model Crop {
   id        Int   @id @default(autoincrement())
@@ -55,7 +61,7 @@ model ServiceCategory {
 
 model User {
   id           Int        @id @default(autoincrement())
-  role         RoleType
+  roleId       Int
   name         String?
   mobile       String?       @unique
   email        String?       @unique
@@ -66,6 +72,7 @@ model User {
   updatedAt    DateTime      @updatedAt
 
   locations    UserLocation[]
+  role         Role     @relation(fields: [roleId], references: [id])
   farms        Farm[]
   sentRequests ServiceRequest[] @relation("FarmerToRequest")
   receivedJobs ServiceRequest[] @relation("ProviderToRequest")
@@ -73,7 +80,7 @@ model User {
 
 model Otp {
   id        Int   @id @default(autoincrement())
-  mobile    String   
+  mobile    String   @unique
   code      String?
   expiresAt DateTime?
   createdAt DateTime @default(now())
