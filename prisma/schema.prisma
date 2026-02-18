@@ -8,14 +8,11 @@ datasource db {
 }
 
 
-
-
 enum ServiceRequestStatus {
-  SUBMITTED
+  PENDING
   APPROVED
   REJECTED
   ASSIGNED
-  ACCEPTED
   IN_PROGRESS
   COMPLETED
 }
@@ -33,6 +30,8 @@ model Role {
   updatedAt DateTime @updatedAt
 
   users     User[]
+
+  @@map("role")
 }
 
 
@@ -43,9 +42,11 @@ model Crop {
   updatedAt DateTime @updatedAt
 
   farms     Farm[]
+
+  @@map("crop")
 }
 
-model ServiceCategory {
+model ServiceType {
   id          Int   @id @default(autoincrement())
   name        String   @db.VarChar(120)     
   price       Decimal?                      
@@ -56,6 +57,9 @@ model ServiceCategory {
   updatedAt   DateTime @updatedAt
 
   requests    ServiceRequest[]
+
+  @@map("service_type")
+  
 }
 
 
@@ -71,11 +75,13 @@ model User {
   createdAt    DateTime      @default(now())
   updatedAt    DateTime      @updatedAt
 
-  locations    UserLocation[]
+ 
   role         Role     @relation(fields: [roleId], references: [id])
   farms        Farm[]
   sentRequests ServiceRequest[] @relation("FarmerToRequest")
   receivedJobs ServiceRequest[] @relation("ProviderToRequest")
+
+  @@map("user")
 }
 
 model Otp {
@@ -85,20 +91,10 @@ model Otp {
   expiresAt DateTime?
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+
+  @@map("otp")
 }
 
-
-model UserLocation {
-  id        Int   @id @default(autoincrement())
-  userId    Int
-  latitude  String
-  longitude String
-  label     String?               
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  user      User     @relation(fields: [userId], references: [id])
-}
 
 model Farm {
   id          Int   @id @default(autoincrement())
@@ -115,6 +111,8 @@ model Farm {
 
   crop        Crop?    @relation(fields: [cropId], references: [id])
   user        User     @relation(fields: [userId], references: [id])
+  serviceRequest      ServiceRequest[]
+  @@map("farm")
 }
 
 
@@ -122,13 +120,15 @@ model Farm {
 model ServiceRequest {
   id                Int              @id @default(autoincrement())
   farmerId          Int
-  serviceCategoryId Int
+  serviceTypeId     Int
   providerId        Int?
-  status            ServiceRequestStatus @default(SUBMITTED)
+  farmId            Int
+  status            ServiceRequestStatus @default(PENDING)
   details           String?                        
   visitReport       String?                        
   finalNotes        String?                        
-  preferredSlot     SlotType?                      
+  preferredSlot     SlotType?
+  isActive          Boolean             @default(true)                    
   appliedAt         DateTime            @default(now())
   approvedAt        DateTime?
   assignedAt        DateTime?
@@ -138,5 +138,9 @@ model ServiceRequest {
 
   farmer            User                @relation("FarmerToRequest", fields: [farmerId], references: [id])
   provider          User?               @relation("ProviderToRequest", fields: [providerId], references: [id])
-  category          ServiceCategory     @relation(fields: [serviceCategoryId], references: [id])
+  serviceType          ServiceType     @relation(fields: [serviceTypeId], references: [id])
+  farm          Farm          @relation(fields: [farmId], references: [id])
+
+  @@map("service_request")
+                    
 }

@@ -6,8 +6,12 @@ const roleIdSchema = z.object({
 });
 
 
+
 const createRoleSchema = z.object({
-  name: z.enum(['FARMER', 'PROVIDER', 'ADMIN'])
+  name: z.string()
+    .min(3)
+    .max(50)
+    .regex(/^[A-Z_]+$/, 'Role must be uppercase'),
 }).strict();
 
 

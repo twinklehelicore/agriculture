@@ -13,7 +13,6 @@ const nameSchema = z
 
 
 const registerSchema = z.object({
-  role: z.enum(['FARMER', 'PROVIDER']), 
   mobile: mobileSchema,
   name: nameSchema,
   address: z.string().optional(),
