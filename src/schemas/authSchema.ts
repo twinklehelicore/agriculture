@@ -1,4 +1,4 @@
-import { z } from 'zod';
+import { email, z } from 'zod';
 
 
 const mobileSchema = z
@@ -11,10 +11,14 @@ const nameSchema = z
   .max(100)
   .optional();
 
+const emailSchema = z.string().email('Invalid email format')
+
 
 const registerSchema = z.object({
+  role: z.enum(['FARMER', 'PROVIDER'], { message: 'Only FARMER or PROVIDER allowed' }),
   mobile: mobileSchema,
   name: nameSchema,
+  email: emailSchema,
   address: z.string().optional(),
 }).strict();
 
