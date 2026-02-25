@@ -58,7 +58,7 @@ const sendOtp = async (req: Request, res: Response) => {
 
     await prisma.otp.upsert({
       where: { mobile },
-      update: { code, expiresAt },
+      update: { code, expiresAt }, 
       create: { mobile, code, expiresAt },
     });
 
