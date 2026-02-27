@@ -1,3 +1,4 @@
+//src/controllers/authController.ts
 import { Request, Response } from "express";
 import prisma from '../lib/prisma';
 import logger from "../utils/logger";

@@ -36,7 +36,6 @@ const updateUserSchema = z.object({
 
 
 
-
 const updateRequestStatus = z.object({
     status: z.enum(['PENDING', 'APPROVED', 'REJECTED', 'ASSSIGNED', 'IN_PROGRESS', 'COMPLETED']),
     provider_id: z.coerce.number().int().positive('Provider id must be positive')

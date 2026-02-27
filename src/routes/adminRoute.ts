@@ -1,3 +1,4 @@
+//src/routes/adminRoute.ts
 import { Router } from "express";
 import adminController from "../controllers/adminController";
 import { validate } from "../middleware/validate";
@@ -12,14 +13,16 @@ router.post('/add-service', validate(adminSchema.createServiceSchema), adminCont
 router.patch('/update-service/:id', validate(adminSchema.serviceIdSchema.merge(adminSchema.updateServiceSchema)), adminController.updateService);
 router.get('/list-service', adminController.listServices),
 router.get('/list-service/:id', validate(adminSchema.serviceIdSchema), adminController.getServiceById )
-router.delete('/delete:service/:id', validate(adminSchema.serviceIdSchema), adminController.deleteService)
+router.delete('/delete-service/:id', validate(adminSchema.serviceIdSchema), adminController.deleteService)
 router.put('/update-status', validate(adminSchema.updateRequestStatus), adminController.updateRequestStatus)
 
 //user routes
 router.post('/add-user', validate(adminSchema.createUserSchema), adminController.addUser),
 router.patch('/update-user/:id', validate(adminSchema.updateUserSchema), adminController.updateUser),
 router.get('/list-farmers', adminController.listFarmer),
-router.get('/list-providers', adminController.listProviders)
+router.get('/list-providers', adminController.listProviders),
+router.get('/list-users', adminController.listUser),
+router.patch('/delete-user/:id', validate(adminSchema.userIdSchema), adminController.deleteUser)
 
 
 export default router;

@@ -4,6 +4,7 @@ import express from 'express';
 import prisma from './lib/prisma';
 import authRoutes from './routes/authRoute';
 import adminRoutes from './routes/adminRoute';
+import farmerRoutes from './routes/farmerRoute';
 
 const app = express();
 const PORT = Number(process.env.PORT) || 3000;
@@ -14,6 +15,8 @@ app.use(express.json());
 // Routes
 app.use('/auth', authRoutes);
 app.use('/admin', adminRoutes);
+app.use('/farmer', farmerRoutes);
+
 
 // Health check (tests DB connection)
 app.get('/health', async (req, res) => {

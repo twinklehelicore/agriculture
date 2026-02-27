@@ -1,7 +1,7 @@
 import { Request,response,Response } from "express";
 import prisma from "../lib/prisma";
 import logger from "../utils/logger";
-import { any } from "zod";
+
 
 //service crud
 const createService = async (req: Request, res: Response) => {
@@ -71,7 +71,7 @@ const deleteService = async (req: Request, res: Response) => {
         await prisma.serviceType.delete({
             where: {id: Number(id)}
         });
-        return res.status(200).json('Service deeted');
+        return res.status(200).json('Service deleted');
     }catch(err: any){
         logger.error('Service not updated', err);
         return res.status(500).json('Service not updated');
@@ -149,18 +149,32 @@ const updateRequestStatus = async (req: Request, res: Response) => {
   }
 };
 
+const listUser = async (req: Request, res: Response) => {
+  try{
+    const users = await prisma.user.findMany({
+      orderBy: {id: 'asc'}
+    });
+    return res.status(200).json(users);
+  }catch(err: any){
+    logger.error('Service status not updated', err);
+    return res.status(500).json('Unable to list the users');
+  }
+
+};
+
+
 const listFarmer = async (req: Request, res: Response) => {
     try{
         const farmers = await prisma.user.findMany({
             where:{
                 role: {name:'FARMER'}
             },
-            orderBy: {id: 'desc'}
+            orderBy: {id: 'asc'}
         });
 
         return res.status(200).json(farmers);
     }catch(err: any){
-        logger.error('UNable to list farmers', err);
+        logger.error('Unable to list farmers', err);
         return res.status(500).json('Farmers not listed');
 
     }
@@ -172,7 +186,7 @@ const listProviders = async (req: Request, res: Response) => {
             where:{
                 role: {name: 'PROVIDER'}
             },
-            orderBy:{id: 'desc'}
+            orderBy:{id: 'asc'}
         });
         return res.status(200).json(providers);
     }catch(err: any){
@@ -182,6 +196,27 @@ const listProviders = async (req: Request, res: Response) => {
     }
 };
 
+const deleteUser = async (req: Request, res: Response) => {
+  try{
+    const { id } = req.params;
+    const user = await prisma.user.findFirst({
+      where:{
+        id: Number(id)
+      }
+    });
+    if(!user){
+      return res.status(400).json('User not found');
+    }
 
+    await prisma.user.update({
+      where: {id: Number(id)},
+      data: {isActive: false}
+    });
+    return res.status(200).json('User deleted successfully');
+  }catch(err: any){
+    logger.error('Unable to delete user', err);
+    return res.status(500).json('Unable to delete the user');
+  }
+};
 
-export default {createService, listServices, updateService, getServiceById, deleteService, addUser, listFarmer, listProviders, updateUser, updateRequestStatus}
+export default {createService, listServices, updateService, getServiceById, deleteService, addUser, listUser, listFarmer, listProviders, updateUser, deleteUser, updateRequestStatus}

@@ -102,8 +102,8 @@ model Farm {
   name        String                
   area        Decimal?             
   cropId      Int?
-  latitude    String?
-  longitude   String?
+  latitude    Decimal?
+  longitude   Decimal?
   address     String?
   surveyNo    String?
   createdAt   DateTime @default(now())
