@@ -4,6 +4,10 @@ const serviceIdSchema = z.object({
     id: z.coerce.number().int().positive('Service request id must be positive')
 });
 
+const providerIdSchema = z.object({
+  providerId: z.coerce.number().int().positive('Providers id must be positive')
+
+});
 
 const userIdSchema = z.object({
     id: z.coerce.number().int().positive('User id must be posiive')
@@ -41,4 +45,4 @@ const updateRequestStatus = z.object({
     provider_id: z.coerce.number().int().positive('Provider id must be positive')
 }).strict();
 
-export default{ serviceIdSchema, userIdSchema, createServiceSchema, updateServiceSchema, createUserSchema, updateUserSchema, updateRequestStatus}
+export default{ serviceIdSchema, userIdSchema, providerIdSchema, createServiceSchema, updateServiceSchema, createUserSchema, updateUserSchema, updateRequestStatus}

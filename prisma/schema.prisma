@@ -49,7 +49,7 @@ model Crop {
 model ServiceType {
   id          Int   @id @default(autoincrement())
   name        String   @db.VarChar(120)     
-  price       Decimal?                      
+  price       Decimal? @db.Decimal(10, 2)                      
   image       String?  @db.Text
   description String?  @db.Text
   unit        String?                       
@@ -100,10 +100,10 @@ model Farm {
   id          Int   @id @default(autoincrement())
   userId      Int
   name        String                
-  area        Decimal?             
+  area        Decimal?      @db.Decimal(5, 2)       
   cropId      Int?
-  latitude    Decimal?
-  longitude   Decimal?
+  latitude    Decimal?      @db.Decimal(5, 2)
+  longitude   Decimal?      @db.Decimal(5, 2)
   address     String?
   surveyNo    String?
   createdAt   DateTime @default(now())

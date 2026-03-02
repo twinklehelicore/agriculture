@@ -21,8 +21,11 @@ router.post('/add-user', validate(adminSchema.createUserSchema), adminController
 router.patch('/update-user/:id', validate(adminSchema.updateUserSchema), adminController.updateUser),
 router.get('/list-farmers', adminController.listFarmer),
 router.get('/list-providers', adminController.listProviders),
+router.patch('/assign-provider/:id', validate(adminSchema.providerIdSchema), adminController.assignProvider),
 router.get('/list-users', adminController.listUser),
-router.patch('/delete-user/:id', validate(adminSchema.userIdSchema), adminController.deleteUser)
+router.patch('/delete-user/:id', validate(adminSchema.userIdSchema), adminController.deleteUser),
+
+router.get('/list-all-service-request', adminController.listAllServiceRequest)
 
 
 export default router;

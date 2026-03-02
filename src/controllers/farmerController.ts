@@ -4,7 +4,9 @@ import prisma from '../lib/prisma';
 import logger from "../utils/logger";
 
 
+
 //create farm
+
 const createFarm = async (req: Request, res: Response) => {
     try{
         const data = req.body;
@@ -20,6 +22,8 @@ const createFarm = async (req: Request, res: Response) => {
     }
 };
 
+//update farm
+
 const updateFarm = async (req: Request, res: Response) => {
     try{
         const { id } = req.params;
@@ -28,11 +32,11 @@ const updateFarm = async (req: Request, res: Response) => {
         
 
         const farm = await prisma.farm.findFirst({
-      where: {
-        id: Number(id),
-        userId,
-      },
-    });
+            where: {
+                id: Number(id),
+                userId,
+            },
+        });
     if (!farm) {
         return res.status(400).json({ error: 'Farm not found or not yours' });
     }
@@ -46,6 +50,8 @@ const updateFarm = async (req: Request, res: Response) => {
         return res.status(500).json('Farm not updated');
     }
 };
+
+//list all farms
 
 const listFarm = async (req: Request, res: Response) => {
     try{
@@ -61,13 +67,14 @@ const listFarm = async (req: Request, res: Response) => {
     }
 };
 
+//get farm by id
+
 const getFarmById = async (req: Request, res: Response) => {
     try{
         const { id } = req.params;
         const userId = (req as any).user.id;
         const farm = await prisma.farm.findFirst({
-            where:{ id: Number(id)
-                , userId
+            where:{ id: Number(id), userId
             }  
         });
         if(!farm){
@@ -80,6 +87,8 @@ const getFarmById = async (req: Request, res: Response) => {
     }
 };
 
+//service request
+
 const serviceRequest = async (req: Request, res: Response) => {
     try{
         const userId = (req as any).user.id;
@@ -91,7 +100,7 @@ const serviceRequest = async (req: Request, res: Response) => {
             }
         });
         if(!farm){
-            return res.status(400).json('Farm doesnot belongs to you');
+            return res.status(400).json('Farm does not belongs to you');
         }
         const service = await prisma.serviceType.findFirst({
             where:{ id: data.serviceTypeId}
@@ -99,6 +108,8 @@ const serviceRequest = async (req: Request, res: Response) => {
         if(!service){
             return res.status(400).json('Service type is not available');
         }
+
+        data.farmerId = userId;
         await prisma.serviceRequest.create({
             data
         });
@@ -107,5 +118,38 @@ const serviceRequest = async (req: Request, res: Response) => {
         logger.error('Unable to create service request', err);
         return res.status(500).json('Service request not created')
     }
+};
+
+//list my service request
+const listMyServiceRequest = async (req: Request, res: Response) => {
+    try{
+        const userId = (req as any).user.id;
+        const request = await prisma.serviceRequest.findMany({
+            where:{farmerId: userId},
+            orderBy:{id: 'asc'}
+        });
+        return res.status(200).json(request);
+    }catch(err: any){
+        logger.error('Unable to list your service requests', err);
+        return res.status(500).json('Your service requets not listed');
+    }
+};
+
+//delete service request
+
+const deleteServiceRequest = async (req: Request, res: Response) => {
+    try{
+        const { id } = req.params;
+        await prisma.serviceRequest.delete({
+            where:{id: Number(id)}
+        });
+        return res.status(200).json('Your sevice request deleted successfully');
+    }catch(err: any){
+        logger.error('Unable to delete your service request', err);
+        return res.status(500).json('Your service request not deleted');
+        
+
+    }
 }
-export default {createFarm, updateFarm, listFarm, getFarmById, serviceRequest}
+
+export default {createFarm, updateFarm, listFarm, getFarmById, serviceRequest, listMyServiceRequest, deleteServiceRequest}

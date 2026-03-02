@@ -1,6 +1,12 @@
 import { z } from 'zod';
 
-const farmIdSchema = z.coerce.number().int().positive('Farm id must be positive');
+const farmIdSchema = z.object({
+    id: z.coerce.number().int().positive('Farm id must be positive')
+});
+
+const serviceIdSchema = z.object({
+    id: z.coerce.number().int().positive('SErvide id must be positive')
+});
 
 const createFarmSchema = z.object({
     name: z.string().trim().min(3, 'Name must be at least 3 characters').max(100),
@@ -21,4 +27,4 @@ const serviceRequestSchema = z.object({
 }).strict();
 
 
-export default { farmIdSchema, createFarmSchema, updateFarmSchema,serviceRequestSchema }
+export default { farmIdSchema, createFarmSchema, updateFarmSchema,serviceRequestSchema, serviceIdSchema }

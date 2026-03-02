@@ -1,9 +1,11 @@
-import { Request,response,Response } from "express";
+//src/controllers/adminController.ts
+import { Request, Response } from "express";
 import prisma from "../lib/prisma";
 import logger from "../utils/logger";
 
 
 //service crud
+
 const createService = async (req: Request, res: Response) => {
     try{
         const data = req.body;
@@ -18,6 +20,8 @@ const createService = async (req: Request, res: Response) => {
     }
 };
 
+//list services
+
 const listServices = async (req: Request, res: Response) => {
     try{
         const services = await prisma.serviceType.findMany({});
@@ -29,6 +33,7 @@ const listServices = async (req: Request, res: Response) => {
     }
 };
 
+//get service by id
 
 const getServiceById = async (req: Request, res: Response) => {
   try {
@@ -48,6 +53,7 @@ const getServiceById = async (req: Request, res: Response) => {
     return res.status(500).json({ error: 'Failed to fetch service' });
   }
 };
+//update sevice
 
 const updateService = async (req: Request, res: Response) => {
     try{
@@ -65,6 +71,8 @@ const updateService = async (req: Request, res: Response) => {
     }
 };
 
+//delete service
+
 const deleteService = async (req: Request, res: Response) => {
     try{
         const { id } = req.params;
@@ -79,7 +87,7 @@ const deleteService = async (req: Request, res: Response) => {
 };
 
 //user crud
-
+//add users
 const addUser = async (req: Request, res:Response) =>{
   try{
     const data = req.body;
@@ -108,6 +116,8 @@ const addUser = async (req: Request, res:Response) =>{
   }
 };
 
+//update user
+
 const updateUser = async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
@@ -125,6 +135,7 @@ const updateUser = async (req: Request, res: Response) => {
   }
 };
 
+//update request status
 
 const updateRequestStatus = async (req: Request, res: Response) => {
   try {
@@ -149,6 +160,8 @@ const updateRequestStatus = async (req: Request, res: Response) => {
   }
 };
 
+//list users
+
 const listUser = async (req: Request, res: Response) => {
   try{
     const users = await prisma.user.findMany({
@@ -162,6 +175,7 @@ const listUser = async (req: Request, res: Response) => {
 
 };
 
+//list farmer
 
 const listFarmer = async (req: Request, res: Response) => {
     try{
@@ -179,6 +193,7 @@ const listFarmer = async (req: Request, res: Response) => {
 
     }
 };
+//list providers
 
 const listProviders = async (req: Request, res: Response) => {
     try{
@@ -195,6 +210,10 @@ const listProviders = async (req: Request, res: Response) => {
 
     }
 };
+
+
+
+//delete user
 
 const deleteUser = async (req: Request, res: Response) => {
   try{
@@ -219,4 +238,40 @@ const deleteUser = async (req: Request, res: Response) => {
   }
 };
 
-export default {createService, listServices, updateService, getServiceById, deleteService, addUser, listUser, listFarmer, listProviders, updateUser, deleteUser, updateRequestStatus}
+//assign the provider
+const assignProvider = async (req: Request, res: Response) =>{
+  try{
+    const data = req.body;
+    const { id } = req.params;
+
+    await prisma.serviceRequest.update({
+      where:{ id: Number(id)},
+      data:{
+        providerId: Number(data.providerId),
+        status:'ASSIGNED',
+        assignedAt: new Date()
+      }
+    });
+    return res.status(200).json('Provider has assigned');
+  }catch(err: any){
+    logger.error('Unable to assign the provider', err);
+    return res.status(500).json('Providers not assigned');
+
+  }
+};
+
+//list all service request
+const listAllServiceRequest = async (req: Request, res: Response) => {
+  try{
+    const request = await prisma.serviceRequest.findMany({
+      orderBy:{id: 'asc'}
+    });
+    return res.status(200).json(request);
+  }catch(err: any){
+    logger.error('Unable to list service request', err);
+    return res.status(500).json('SErvice request not listed');
+
+  }
+};
+
+export default {createService, listServices, updateService, getServiceById, deleteService, addUser, listUser, listFarmer, listProviders, assignProvider, updateUser, deleteUser, updateRequestStatus, listAllServiceRequest}

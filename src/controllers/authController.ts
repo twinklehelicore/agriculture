@@ -5,11 +5,12 @@ import logger from "../utils/logger";
 import jwt from "jsonwebtoken";
 import bycrpt from 'bcryptjs';
 
+//register
+
 const register = async (req: Request, res: Response) => {
   try {
     const data = req.body;
 
-    // Find roleId from role name
     const roleRecord = await prisma.role.findFirst({ where: { name: data.role } });
     if (!roleRecord) {
       return res.status(400).json({ error: 'Invalid role' });
@@ -35,8 +36,10 @@ const register = async (req: Request, res: Response) => {
     return res.status(500).json({ error: 'Registration failed' });
     }
 
-   
   };
+
+//send otp
+  
 const sendOtp = async (req: Request, res: Response) => {
   try {
     const { mobile } = req.body;
@@ -72,6 +75,7 @@ const sendOtp = async (req: Request, res: Response) => {
   }
 };
 
+//verify otp
 
 const verifyOtp = async (req: Request, res: Response) => {
   try{
@@ -113,6 +117,8 @@ const verifyOtp = async (req: Request, res: Response) => {
     return res.status(500).json({ error: 'Login failed' });
   }
 };
+
+//admin login
 
 const adminlogin = async (req: Request, res:Response) => {
   try{
