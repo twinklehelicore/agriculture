@@ -58,7 +58,7 @@ const listFarm = async (req: Request, res: Response) => {
         const userId = (req as any).user.id;
         const farm = await prisma.farm.findMany({
             where:{userId},
-            orderBy: { id: 'asc'}
+            orderBy: { id: 'desc'}
         });
         return res.status(200).json(farm);
     }catch(err: any){
@@ -86,6 +86,22 @@ const getFarmById = async (req: Request, res: Response) => {
         return res.status(500).json('Unable to find a farm');
     }
 };
+
+const deleteFarm = async (req: Request, res: Response) => {
+    try{
+        const { id } = req.params;
+        await prisma.farm.delete({
+            where:{id: Number(id),
+            }
+            
+        });
+        return res.status(200).json('Your farm is deleted');
+    }catch(err: any){
+        logger.error('Unable to delete your farm', err);
+        return res.status(500).json('Your farm is not deleted');
+    }
+};
+
 
 //service request
 
@@ -126,7 +142,7 @@ const listMyServiceRequest = async (req: Request, res: Response) => {
         const userId = (req as any).user.id;
         const request = await prisma.serviceRequest.findMany({
             where:{farmerId: userId},
-            orderBy:{id: 'asc'}
+            orderBy:{id: 'desc'}
         });
         return res.status(200).json(request);
     }catch(err: any){
@@ -139,9 +155,12 @@ const listMyServiceRequest = async (req: Request, res: Response) => {
 
 const deleteServiceRequest = async (req: Request, res: Response) => {
     try{
+        const userId = (req as any).user.id;
         const { id } = req.params;
         await prisma.serviceRequest.delete({
-            where:{id: Number(id)}
+            where:{id: Number(id),
+                farmerId:userId
+            }
         });
         return res.status(200).json('Your sevice request deleted successfully');
     }catch(err: any){
@@ -150,6 +169,19 @@ const deleteServiceRequest = async (req: Request, res: Response) => {
         
 
     }
-}
+};
+//list crop
 
-export default {createFarm, updateFarm, listFarm, getFarmById, serviceRequest, listMyServiceRequest, deleteServiceRequest}
+const listCrop = async (req: Request, res: Response) => {
+  try{
+    const crop = await prisma.crop.findMany({
+      orderBy:{id: 'desc'}
+    });
+    return res.status(200).json(crop);
+  }catch(err: any){
+    logger.error('Unable to list the crop', err);
+    return res.status(500).json('Crop not listed');
+  }
+};
+
+export default {createFarm, updateFarm, listFarm, getFarmById, serviceRequest, listMyServiceRequest, deleteServiceRequest, deleteFarm, listCrop}

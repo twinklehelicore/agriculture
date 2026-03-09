@@ -6,10 +6,10 @@ import logger from "../utils/logger";
 
 const listAssignedRequest = async (req: Request, res: Response) =>{
     try{
-        const userId = (req as any).user.id;
+        const providerId = (req as any).user.id;
         const request = await prisma.serviceRequest.findMany({
-            where: {id: userId},
-            orderBy: {id: 'asc'}
+            where: {providerId},
+            orderBy: {id: 'desc'}
         });
         return res.status(200).json(request);
     }catch(err: any){
@@ -18,4 +18,94 @@ const listAssignedRequest = async (req: Request, res: Response) =>{
     }
 };
 
-export default { listAssignedRequest }
+const approvedRequest = async (req: Request, res: Response) => {
+    try{
+        const providerId = (req as any).user.id;
+        const { id } = req.params;
+
+        await prisma.serviceRequest.updateMany({
+
+            where:{id: Number(id),
+            providerId,
+            status:'ASSIGNED'
+            },
+            data: {status:'APPROVED',
+            approvedAt: new Date()
+            }
+            
+        });
+        return res.status(200).json('Request approved');
+    }catch(err: any){
+        logger.error('Unable to approved the request', err);
+        return res.status(500).json('Request not approved');
+    }
+};
+
+const inprogressRequest = async (req: Request, res: Response) => {
+    try{
+        const providerId = (req as any).user.id;
+        const { id } = req.params;
+        await prisma.serviceRequest.updateMany({
+            where:{
+                id: Number(id),
+                providerId,
+                status: 'APPROVED'
+            },
+            data: {
+                status:'IN_PROGRESS',
+
+            }
+        });
+        return res.status(200).json('Request in progress');
+    }catch(err: any){
+        logger.error('Unable to change status');
+        return res.status(500).json('Cannot change the status');
+    }
+};
+
+const rejectRequest = async (req: Request, res: Response) => {
+    try{
+        const providerId = (req as any).user.id;
+        const { id } = req.params;
+        
+        await prisma.serviceRequest.updateMany({
+            where:{ id: Number(id),
+                providerId,
+                status: 'ASSIGNED'
+            },
+            data:{
+                status: 'REJECTED'
+            }
+        });
+        return res.status(200).json('Request rejected');
+    }catch(err: any){
+        logger.error('Unable to reject the request', err);
+        return res.status(500).json('Request not rejected');
+    }
+};
+
+const completedRequest = async (req: Request, res: Response) => {
+    try{
+        const { id } = req.params;
+        const providerId = (req as any).user.id;
+
+        await prisma.serviceRequest.updateMany({
+            where:{
+                id: Number(id),
+                providerId,
+                status: 'IN_PROGRESS'
+            },
+            data:{
+                status: 'COMPLETED',
+                completedAt: new Date()
+            }
+        });
+        return res.status(200).json('Request completed');
+    }catch(err: any){
+        logger.error('Unable to change status to completed');
+        return res.status(500).json('Request not completed')
+    }
+};
+
+
+export default { listAssignedRequest, approvedRequest, inprogressRequest, rejectRequest, completedRequest}

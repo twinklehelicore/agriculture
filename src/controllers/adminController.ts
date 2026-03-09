@@ -165,7 +165,7 @@ const updateRequestStatus = async (req: Request, res: Response) => {
 const listUser = async (req: Request, res: Response) => {
   try{
     const users = await prisma.user.findMany({
-      orderBy: {id: 'asc'}
+      orderBy: {id: 'desc'}
     });
     return res.status(200).json(users);
   }catch(err: any){
@@ -183,7 +183,7 @@ const listFarmer = async (req: Request, res: Response) => {
             where:{
                 role: {name:'FARMER'}
             },
-            orderBy: {id: 'asc'}
+            orderBy: {id: 'desc'}
         });
 
         return res.status(200).json(farmers);
@@ -201,7 +201,7 @@ const listProviders = async (req: Request, res: Response) => {
             where:{
                 role: {name: 'PROVIDER'}
             },
-            orderBy:{id: 'asc'}
+            orderBy:{id: 'desc'}
         });
         return res.status(200).json(providers);
     }catch(err: any){
@@ -264,7 +264,7 @@ const assignProvider = async (req: Request, res: Response) =>{
 const listAllServiceRequest = async (req: Request, res: Response) => {
   try{
     const request = await prisma.serviceRequest.findMany({
-      orderBy:{id: 'asc'}
+      orderBy:{id: 'desc'}
     });
     return res.status(200).json(request);
   }catch(err: any){
@@ -274,4 +274,83 @@ const listAllServiceRequest = async (req: Request, res: Response) => {
   }
 };
 
-export default {createService, listServices, updateService, getServiceById, deleteService, addUser, listUser, listFarmer, listProviders, assignProvider, updateUser, deleteUser, updateRequestStatus, listAllServiceRequest}
+//crud crop
+
+//create crops
+
+const createCrop = async (req: Request, res: Response) => {
+  try{
+    const data = req.body;
+    await prisma.crop.create({
+      data
+    });
+    return res.status(200).json('Crop created successfully');
+  }catch(err: any){
+    logger.error('Unable to create crop', err);
+    return res.status(500).json('Crop not created');
+  }
+};
+
+const updateCrop = async (req: Request, res: Response) => {
+  try{
+    const { id } = req.params;
+    const data = req.body;
+
+    await prisma.crop.update({
+      where:{ id: Number(id)},
+      data: data
+    });
+    return res.status(200).json('Crop updated successfully');
+  }catch(err: any){
+    logger.error('Unable to update the crop', err);
+    return res.status(500).json('Crop not updated');
+  }
+};
+
+//list crops
+
+const listCrop = async (req: Request, res: Response) => {
+  try{
+    const crop = await prisma.crop.findMany({
+      orderBy:{id: 'desc'}
+    });
+    return res.status(200).json(crop);
+  }catch(err: any){
+    logger.error('Unable to list the crop', err);
+    return res.status(500).json('Crop not listed');
+  }
+};
+
+const listCropById = async (req: Request, res: Response) => {
+  try{
+    const { id } = req.params;
+    const crop = await prisma.crop.findFirst({
+      where:{
+        id: Number(id)
+      }
+    });
+    return res.status(200).json(crop);
+
+  }catch(err: any){
+    logger.error('Unable to list the crop', err);
+    return res.status(500).json('Crop not listed');
+  }
+};
+
+const deleteCrop = async (req: Request, res: Response) => {
+  try{
+    const { id } = req.params;
+    await prisma.crop.delete({
+      where:{ id: Number(id)}
+    });
+    return res.status(200).json('Crop deleted successfully');
+  }catch(err: any){
+    logger.error('Unable to delete the crop', err);
+    return res.status(500).json('Cannot delete the crop');
+  }
+};
+
+
+
+
+export default {createService, listServices, updateService, getServiceById, deleteService, addUser, listUser, listFarmer, listProviders, assignProvider, updateUser, deleteUser, updateRequestStatus, listAllServiceRequest, createCrop, updateCrop, listCrop, listCropById, deleteCrop}

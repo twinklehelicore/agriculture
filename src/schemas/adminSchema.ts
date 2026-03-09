@@ -40,9 +40,18 @@ const updateUserSchema = z.object({
 
 
 
-const updateRequestStatus = z.object({
-    status: z.enum(['PENDING', 'APPROVED', 'REJECTED', 'ASSSIGNED', 'IN_PROGRESS', 'COMPLETED']),
-    provider_id: z.coerce.number().int().positive('Provider id must be positive')
-}).strict();
 
-export default{ serviceIdSchema, userIdSchema, providerIdSchema, createServiceSchema, updateServiceSchema, createUserSchema, updateUserSchema, updateRequestStatus}
+const cropIdSchema = z.object({
+  id: z.coerce.number().int().positive('Crop ID must be a positive number')
+});
+
+const createCropSchema = z.object({
+    name: z.string().min(3, 'Must be atleast 3 character required')
+});
+
+const updateCropSchema = createCropSchema.partial().strict();
+
+
+
+
+export default{ serviceIdSchema, userIdSchema, providerIdSchema, createServiceSchema, updateServiceSchema, createUserSchema, updateUserSchema, cropIdSchema, createCropSchema, updateCropSchema}

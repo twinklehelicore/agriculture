@@ -15,6 +15,7 @@ const createFarmSchema = z.object({
     surveyNo: z.string().trim().optional(),
     latitude: z.number().optional(),
     longitude: z.number().optional(),
+    cropId: z.coerce.number().int().positive('Crop id must be positive').optional(),
 }).strict();
 
 const updateFarmSchema = createFarmSchema.partial().strict();

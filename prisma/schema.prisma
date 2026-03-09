@@ -132,7 +132,7 @@ model ServiceRequest {
   appliedAt         DateTime            @default(now())
   approvedAt        DateTime?
   assignedAt        DateTime?
-  acceptedAt        DateTime?
+  inProgressAt      DateTime?
   completedAt       DateTime?
   updatedAt         DateTime            @updatedAt
 

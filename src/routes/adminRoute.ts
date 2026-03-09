@@ -13,8 +13,7 @@ router.post('/add-service', validate(adminSchema.createServiceSchema), adminCont
 router.patch('/update-service/:id', validate(adminSchema.serviceIdSchema.merge(adminSchema.updateServiceSchema)), adminController.updateService);
 router.get('/list-service', adminController.listServices),
 router.get('/list-service/:id', validate(adminSchema.serviceIdSchema), adminController.getServiceById )
-router.delete('/delete-service/:id', validate(adminSchema.serviceIdSchema), adminController.deleteService)
-router.put('/update-status', validate(adminSchema.updateRequestStatus), adminController.updateRequestStatus)
+router.delete('/delete-service/:id', validate(adminSchema.serviceIdSchema), adminController.deleteService),
 
 //user routes
 router.post('/add-user', validate(adminSchema.createUserSchema), adminController.addUser),
@@ -27,5 +26,13 @@ router.patch('/delete-user/:id', validate(adminSchema.userIdSchema), adminContro
 
 router.get('/list-all-service-request', adminController.listAllServiceRequest)
 
+
+//crop routes
+
+router.post('/create-crop', validate(adminSchema.createCropSchema), adminController.createCrop),
+router.patch('/update-crop/:id', validate(adminSchema.cropIdSchema.merge(adminSchema.updateCropSchema)), adminController.updateCrop),
+router.get('/list-crop', adminController.listCrop),
+router.get('/list-crop-by-id/:id', validate(adminSchema.cropIdSchema), adminController.listCropById),
+router.delete('/delete-crop/:id', validate(adminSchema.cropIdSchema), adminController.deleteCrop)
 
 export default router;

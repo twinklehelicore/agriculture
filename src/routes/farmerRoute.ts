@@ -4,7 +4,7 @@ import farmerController from "../controllers/farmerController";
 import { validate } from "../middleware/validate" 
 import farmerSchema from "../schemas/farmerSchema";
 import auth from "../middleware/auth";
-import adminSchema from "@/schemas/adminSchema";
+
 
 const router = Router();
 
@@ -17,6 +17,8 @@ router.patch('/update-farm/:id', validate(farmerSchema.farmIdSchema.merge(farmer
 router.post('/service-request', validate(farmerSchema.serviceRequestSchema), farmerController.serviceRequest),
 router.get('/my-service-request', farmerController.listMyServiceRequest),
 router.delete('/delete-my-service-request/:id', validate(farmerSchema.serviceIdSchema), farmerController.deleteServiceRequest)
+router.delete('/delete-farm/:id', validate(farmerSchema.farmIdSchema), farmerController.deleteFarm),
+router.get('/list-crop', farmerController.listCrop)
 
 
 export default router;
