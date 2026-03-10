@@ -135,30 +135,6 @@ const updateUser = async (req: Request, res: Response) => {
   }
 };
 
-//update request status
-
-const updateRequestStatus = async (req: Request, res: Response) => {
-  try {
-    const { id } = req.params;
-    const { status, providerId } = req.body;
-
-    const request = await prisma.serviceRequest.update({
-      where: { id: Number(id) },
-      data: {
-        status,
-        providerId: providerId
-      }
-    });
-
-    return res.status(200).json({
-      message: 'Request status updated',
-      request,
-    });
-  } catch (err: any) {
-    logger.error('Service status not updated', err);
-    return res.status(500).json({ error: 'Failed to update request status' });
-  }
-};
 
 //list users
 
@@ -269,7 +245,7 @@ const listAllServiceRequest = async (req: Request, res: Response) => {
     return res.status(200).json(request);
   }catch(err: any){
     logger.error('Unable to list service request', err);
-    return res.status(500).json('SErvice request not listed');
+    return res.status(500).json('Service request not listed');
 
   }
 };
@@ -353,4 +329,4 @@ const deleteCrop = async (req: Request, res: Response) => {
 
 
 
-export default {createService, listServices, updateService, getServiceById, deleteService, addUser, listUser, listFarmer, listProviders, assignProvider, updateUser, deleteUser, updateRequestStatus, listAllServiceRequest, createCrop, updateCrop, listCrop, listCropById, deleteCrop}
+export default {createService, listServices, updateService, getServiceById, deleteService, addUser, listUser, listFarmer, listProviders, assignProvider, updateUser, deleteUser, listAllServiceRequest, createCrop, updateCrop, listCrop, listCropById, deleteCrop}

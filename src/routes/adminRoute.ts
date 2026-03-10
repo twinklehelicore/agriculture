@@ -3,11 +3,12 @@ import { Router } from "express";
 import adminController from "../controllers/adminController";
 import { validate } from "../middleware/validate";
 import adminSchema from "../schemas/adminSchema";
+import auth from "../middleware/auth";
 
 
 const router = Router();
 
-
+router.use(auth('ADMIN'));
 //service routes
 router.post('/add-service', validate(adminSchema.createServiceSchema), adminController.createService),
 router.patch('/update-service/:id', validate(adminSchema.serviceIdSchema.merge(adminSchema.updateServiceSchema)), adminController.updateService);

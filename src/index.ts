@@ -1,6 +1,6 @@
-// src/index.ts
 import 'dotenv/config';
 import express from 'express';
+import cors from 'cors';
 import prisma from './lib/prisma';
 import authRoutes from './routes/authRoute';
 import adminRoutes from './routes/adminRoute';
@@ -11,6 +11,7 @@ const app = express();
 const PORT = Number(process.env.PORT) || 3000;
 
 // Middleware
+app.use(cors({ origin: 'http://localhost:5173' }));
 app.use(express.json());
 
 // Routes
@@ -19,8 +20,7 @@ app.use('/admin', adminRoutes);
 app.use('/farmer', farmerRoutes);
 app.use('/provider', providerRoutes);
 
-
-// Health check (tests DB connection)
+// Health check
 app.get('/health', async (req, res) => {
   try {
     await prisma.$connect();
@@ -31,47 +31,24 @@ app.get('/health', async (req, res) => {
   }
 });
 
-// Welcome endpoint
 app.get('/', (req, res) => {
-  res.json({
-    message: 'Welcome to Agriculture Service API',
-    status: 'online',
-    endpoints: {
-      auth: '/auth/register, /auth/send-otp, /auth/verify-otp, /auth/admin-login',
-      health: '/health'
-    }
-  });
+  res.json({ message: 'Welcome to Agriculture Service API', status: 'online' });
 });
 
-// 404 handler
 app.use((req, res) => {
   res.status(404).json({ error: 'Route not found' });
 });
 
-// Global error handler
 app.use((err: any, req: express.Request, res: express.Response, next: express.NextFunction) => {
   console.error('Error:', err.message || err);
   res.status(500).json({ error: 'Something went wrong' });
 });
 
-// Start server
 app.listen(PORT, () => {
-  console.log(`Server running on http://localhost:${PORT}`);
-  console.log('Test these:');
-  console.log(`  → GET  http://localhost:${PORT}/health`);
-  console.log(`  → POST http://localhost:${PORT}/auth/register`);
-  console.log(`  → POST http://localhost:${PORT}/auth/admin-login`);
+  console.log(`✅ Backend running on http://localhost:${PORT}`);
 });
 
-// Graceful shutdown
 process.on('SIGINT', async () => {
-  console.log('\nShutting down...');
-  await prisma.$disconnect();
-  process.exit(0);
-});
-
-process.on('SIGTERM', async () => {
-  console.log('SIGTERM received. Shutting down...');
   await prisma.$disconnect();
   process.exit(0);
 });
