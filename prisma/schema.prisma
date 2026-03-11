@@ -50,7 +50,7 @@ model ServiceType {
   id          Int   @id @default(autoincrement())
   name        String   @db.VarChar(120)     
   price       Decimal? @db.Decimal(10, 2)                      
-  image       String?  @db.Text
+  image       String?  @db.LongText
   description String?  @db.Text
   unit        String?                       
   createdAt   DateTime @default(now())

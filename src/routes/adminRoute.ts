@@ -22,6 +22,7 @@ router.patch('/update-user/:id', validate(adminSchema.updateUserSchema), adminCo
 router.get('/list-farmers', adminController.listFarmer),
 router.get('/list-providers', adminController.listProviders),
 router.patch('/assign-provider/:id', validate(adminSchema.providerIdSchema), adminController.assignProvider),
+router.patch('/reject-request/:id', adminController.rejectRequest),
 router.get('/list-users', adminController.listUser),
 router.patch('/delete-user/:id', validate(adminSchema.userIdSchema), adminController.deleteUser),
 

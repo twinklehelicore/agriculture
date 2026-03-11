@@ -141,7 +141,8 @@ const updateUser = async (req: Request, res: Response) => {
 const listUser = async (req: Request, res: Response) => {
   try{
     const users = await prisma.user.findMany({
-      orderBy: {id: 'desc'}
+      orderBy: {id: 'desc'},
+      include: { role: true }
     });
     return res.status(200).json(users);
   }catch(err: any){
@@ -236,6 +237,19 @@ const assignProvider = async (req: Request, res: Response) =>{
   }
 };
 
+const rejectRequest = async (req: Request, res: Response) => {
+  try {
+    const { id } = req.params;
+    await prisma.serviceRequest.update({
+      where: { id: Number(id) },
+      data: { status: 'REJECTED' }
+    });
+    return res.status(200).json('Request rejected');
+  } catch (err: any) {
+    logger.error('Unable to reject request', err);
+    return res.status(500).json('Request not rejected');
+  }
+};
 //list all service request
 const listAllServiceRequest = async (req: Request, res: Response) => {
   try{
@@ -329,4 +343,4 @@ const deleteCrop = async (req: Request, res: Response) => {
 
 
 
-export default {createService, listServices, updateService, getServiceById, deleteService, addUser, listUser, listFarmer, listProviders, assignProvider, updateUser, deleteUser, listAllServiceRequest, createCrop, updateCrop, listCrop, listCropById, deleteCrop}
+export default {createService, listServices, updateService, getServiceById, deleteService, addUser, listUser, listFarmer, listProviders, assignProvider, rejectRequest, updateUser, deleteUser, listAllServiceRequest, createCrop, updateCrop, listCrop, listCropById, deleteCrop}

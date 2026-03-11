@@ -52,6 +52,7 @@ const sendOtp = async (req: Request, res: Response) => {
     if (!user) {
       return res.status(400).json({ error: 'User not found' });
     }
+    if (!user.isActive) return res.status(400).json({ error: 'Your account has been deactivated. Contact admin.' });
 
     if (user.role.name === 'ADMIN') {
       return res.status(400).json({ error: 'Admins cannot use OTP' });
@@ -78,41 +79,52 @@ const sendOtp = async (req: Request, res: Response) => {
 //verify otp
 
 const verifyOtp = async (req: Request, res: Response) => {
-  try{
-    const { mobile, code} = req.body;
-    const otp = await prisma.otp.findFirst({
-      where:{
-        mobile
-      }
-    });
-    if (!otp || otp.code !== code || (otp.expiresAt && otp.expiresAt < new Date())) {
-      return res.status(400).json({ error: 'Invalid or expired OTP' });
+  try {
+    const { mobile, code } = req.body;
+
+    console.log('=== DEBUG ===');
+    console.log('mobile:', JSON.stringify(mobile));
+    console.log('code received:', JSON.stringify(code));
+
+    const otp = await prisma.otp.findFirst({ where: { mobile } });
+
+    console.log('otp found:', otp);
+    console.log('=== END DEBUG ===');
+
+    if (!otp) {
+      return res.status(400).json({ error: 'OTP not found for this mobile' });
     }
+
+    if (otp.code?.trim() !== code?.toString().trim()) {
+      return res.status(400).json({ error: `Code mismatch - DB: ${otp.code} | Received: ${code}` });
+    }
+
+    if (otp.expiresAt && otp.expiresAt < new Date()) {
+      return res.status(400).json({ error: 'OTP expired' });
+    }
+
     const user = await prisma.user.findFirst({
-      where:{
-        mobile
-      },
-      include:{
-        role:true
-      }
+      where: { mobile },
+      include: { role: true }
     });
-    if(!user){
-      return res.status(400).json('User not found');
-    }
-    if(user.role.name === 'ADMIN'){
-      return res.status(400).json('Admin cannot use otp')
-    }
-    await prisma.otp.delete({
-      where:{mobile}
-    });
+
+    if (!user) return res.status(400).json({ error: 'User not found' });
+    if (user.role.name === 'ADMIN') return res.status(400).json({ error: 'Admin cannot use OTP' });
+
+    await prisma.otp.delete({ where: { mobile } });
 
     const token = jwt.sign(
       { id: user.id, role: user.role.name },
       process.env.JWT_SECRET as string,
       { expiresIn: '7d' }
     );
-    return res.json({token, user:{id:user.id, mobile: user.mobile, name: user.name}});
-  }catch(err:any){
+
+    return res.json({
+      token,
+      user: { id: user.id, mobile: user.mobile, name: user.name, role: user.role.name }
+    });
+
+  } catch (err: any) {
     logger.error('Verify OTP error:', err.message);
     return res.status(500).json({ error: 'Login failed' });
   }
@@ -138,7 +150,7 @@ const adminlogin = async (req: Request, res:Response) => {
       process.env.JWT_SECRET as string,
       { expiresIn: '7d' }
     );
-    return res.status(200).json({token, user:{id: user.id, email: user.email, name: user.name}})
+    return res.status(200).json({token, user:{id: user.id, email: user.email, name: user.name, role: user.role.name}})
 }catch (err: any) {
     logger.error('Admin login error:', err.message);
     return res.status(500).json({ error: 'Login failed' });
