@@ -1,0 +1,7 @@
+import api from './axios';
+
+export const getAssignedRequests = () => api.get('/provider/assigned-request');
+export const approveRequest = (id: number) => api.patch(`/provider/approved-request/${id}`);
+export const startProgress = (id: number) => api.patch(`/provider/inprogess-request/${id}`);
+export const completeRequest = (id: number) => api.patch(`/provider/completed-request/${id}`);
+export const rejectRequest = (id: number) => api.patch(`/provider/reject-request/${id}`);
