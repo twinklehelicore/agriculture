@@ -5,6 +5,8 @@ import logger from "../utils/logger";
 import jwt from "jsonwebtoken";
 import bycrpt from 'bcryptjs';
 
+
+
 //register
 
 const register = async (req: Request, res: Response) => {

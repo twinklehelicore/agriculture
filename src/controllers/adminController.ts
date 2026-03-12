@@ -215,25 +215,24 @@ const deleteUser = async (req: Request, res: Response) => {
   }
 };
 
-//assign the provider
-const assignProvider = async (req: Request, res: Response) =>{
-  try{
-    const data = req.body;
+const assignProvider = async (req: Request, res: Response) => {
+  try {
+    const { providerId } = req.body;
     const { id } = req.params;
 
     await prisma.serviceRequest.update({
-      where:{ id: Number(id)},
-      data:{
-        providerId: Number(data.providerId),
-        status:'ASSIGNED',
+      where: { id: Number(id) },
+      data: {
+        providerId,
+        status: "ASSIGNED",
         assignedAt: new Date()
       }
     });
-    return res.status(200).json('Provider has assigned');
-  }catch(err: any){
-    logger.error('Unable to assign the provider', err);
-    return res.status(500).json('Providers not assigned');
 
+    return res.status(200).json("Provider has assigned");
+  } catch (err: any) {
+    logger.error("Unable to assign the provider", err);
+    return res.status(500).json("Providers not assigned");
   }
 };
 

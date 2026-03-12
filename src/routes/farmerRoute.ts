@@ -19,6 +19,7 @@ router.get('/my-service-request', farmerController.listMyServiceRequest),
 router.delete('/delete-my-service-request/:id', validate(farmerSchema.serviceIdSchema), farmerController.deleteServiceRequest)
 router.delete('/delete-farm/:id', validate(farmerSchema.farmIdSchema), farmerController.deleteFarm),
 router.get('/list-crop', farmerController.listCrop)
+router.get('/list-services', farmerController.listServices);
 
 
 export default router;

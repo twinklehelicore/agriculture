@@ -11,11 +11,11 @@ export default (role?: string) => (req: Request, res: Response, next: NextFuncti
     (req as any).user = decoded;
 
     if (role && decoded.role !== role) {
-      return res.status(403).json({ error: `${role} required` });
+      return res.status(400).json({ error: `${role} required` });
     }
 
     next();
   } catch (err: any) {
-    return res.status(401).json({ error: err.name === 'TokenExpiredError' ? 'Token expired' : 'Invalid token' });
+    return res.status(400).json({ error: err.name === 'TokenExpiredError' ? 'Token expired' : 'Invalid token' });
   }
 };

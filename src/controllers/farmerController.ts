@@ -58,7 +58,8 @@ const listFarm = async (req: Request, res: Response) => {
         const userId = (req as any).user.id;
         const farm = await prisma.farm.findMany({
             where:{userId},
-            orderBy: { id: 'desc'}
+            orderBy: { id: 'desc'},
+            include: { crop: true}
         });
         return res.status(200).json(farm);
     }catch(err: any){
@@ -184,4 +185,16 @@ const listCrop = async (req: Request, res: Response) => {
   }
 };
 
-export default {createFarm, updateFarm, listFarm, getFarmById, serviceRequest, listMyServiceRequest, deleteServiceRequest, deleteFarm, listCrop}
+const listServices = async (req: Request, res: Response) => {
+  try {
+    const services = await prisma.serviceType.findMany({
+      orderBy: { id: 'desc' }
+    });
+    return res.status(200).json(services);
+  } catch (err: any) {
+    logger.error('Unable to list services', err);
+    return res.status(500).json('Services not listed');
+  }
+};
+
+export default {createFarm, updateFarm, listFarm, getFarmById, serviceRequest, listMyServiceRequest, deleteServiceRequest, deleteFarm, listCrop, listServices}
