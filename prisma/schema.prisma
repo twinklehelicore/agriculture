@@ -23,6 +23,11 @@ enum SlotType {
   EVENING
 }
 
+enum Priority {
+  NORMAL
+  URGENT
+}
+
 model Role {
   id        Int      @id @default(autoincrement())
   name      String   @unique
@@ -80,6 +85,7 @@ model User {
   farms        Farm[]
   sentRequests ServiceRequest[] @relation("FarmerToRequest")
   receivedJobs ServiceRequest[] @relation("ProviderToRequest")
+  notifications Notification[]
 
   @@map("user")
 }
@@ -128,7 +134,8 @@ model ServiceRequest {
   visitReport       String?                        
   finalNotes        String?                        
   preferredSlot     SlotType?
-  isActive          Boolean             @default(true)                    
+  isActive          Boolean             @default(true)     
+  priority          Priority            @default(NORMAL)               
   appliedAt         DateTime            @default(now())
   approvedAt        DateTime?
   assignedAt        DateTime?
@@ -143,4 +150,20 @@ model ServiceRequest {
 
   @@map("service_request")
                     
+}
+
+
+
+model Notification {
+  id        Int      @id @default(autoincrement())
+  userId    Int
+  title     String
+  message   String   @db.Text
+  isRead    Boolean  @default(false)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user      User     @relation(fields: [userId], references: [id])
+
+  @@map("notification")
 }

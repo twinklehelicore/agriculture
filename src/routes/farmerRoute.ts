@@ -4,7 +4,8 @@ import farmerController from "../controllers/farmerController";
 import { validate } from "../middleware/validate" 
 import farmerSchema from "../schemas/farmerSchema";
 import auth from "../middleware/auth";
-
+import notificationController from "../controllers/notificationController";
+import authController from "../controllers/authController";
 
 const router = Router();
 
@@ -20,6 +21,17 @@ router.delete('/delete-my-service-request/:id', validate(farmerSchema.serviceIdS
 router.delete('/delete-farm/:id', validate(farmerSchema.farmIdSchema), farmerController.deleteFarm),
 router.get('/list-crop', farmerController.listCrop)
 router.get('/list-services', farmerController.listServices);
+
+
+//notification
+router.get('/my-notifications', notificationController.getMyNotifications);
+router.get('/unread-count', notificationController.getUnreadCount);
+router.patch('/mark-all-read', notificationController.markAllRead);
+router.patch('/mark-read/:id', notificationController.markOneRead);
+
+//profile
+router.get('/profile', authController.getProfile);
+router.patch('/update-profile', authController.updateProfile);
 
 
 export default router;

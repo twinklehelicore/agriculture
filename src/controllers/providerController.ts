@@ -2,6 +2,8 @@
 import { Request, Response } from "express";
 import prisma from '../lib/prisma';
 import logger from "../utils/logger";
+import { createNotification } from '../utils/notify';
+
 
 
 const listAssignedRequest = async (req: Request, res: Response) =>{
@@ -22,6 +24,11 @@ const approvedRequest = async (req: Request, res: Response) => {
     try{
         const providerId = (req as any).user.id;
         const { id } = req.params;
+        const request = await prisma.serviceRequest.findFirst({
+            where: { id: Number(id), providerId },
+            include: { serviceType: true }
+    });
+    if (!request) return res.status(400).json('Request not found');
 
         await prisma.serviceRequest.updateMany({
 
@@ -34,6 +41,12 @@ const approvedRequest = async (req: Request, res: Response) => {
             }
             
         });
+         await createNotification(
+            request.farmerId,
+            ' Request Approved',
+            `Your ${request.serviceType.name} request has been approved by the provider.`
+    );
+   
         return res.status(200).json('Request approved');
     }catch(err: any){
         logger.error('Unable to approved the request', err);
@@ -88,6 +101,11 @@ const completedRequest = async (req: Request, res: Response) => {
     try{
         const { id } = req.params;
         const providerId = (req as any).user.id;
+        const request = await prisma.serviceRequest.findFirst({
+            where: { id: Number(id), providerId },
+            include: { serviceType: true }
+        });
+        if (!request) return res.status(400).json('Request not found');
 
         await prisma.serviceRequest.updateMany({
             where:{
@@ -100,6 +118,11 @@ const completedRequest = async (req: Request, res: Response) => {
                 completedAt: new Date()
             }
         });
+         await createNotification(
+            request.farmerId,
+            ' Service Completed',
+            `Your ${request.serviceType.name} service has been completed successfully!`
+    );
         return res.status(200).json('Request completed');
     }catch(err: any){
         logger.error('Unable to change status to completed');

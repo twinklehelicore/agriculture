@@ -4,7 +4,8 @@ import adminController from "../controllers/adminController";
 import { validate } from "../middleware/validate";
 import adminSchema from "../schemas/adminSchema";
 import auth from "../middleware/auth";
-
+import notificationController from "../controllers/notificationController";
+import authController from "../controllers/authController";
 
 const router = Router();
 
@@ -37,4 +38,19 @@ router.get('/list-crop', adminController.listCrop),
 router.get('/list-crop-by-id/:id', validate(adminSchema.cropIdSchema), adminController.listCropById),
 router.delete('/delete-crop/:id', validate(adminSchema.cropIdSchema), adminController.deleteCrop)
 
+
+//notification
+router.patch('/set-priority/:id', adminController.setPriority);
+router.get('/my-notifications', notificationController.getMyNotifications);
+router.get('/unread-count', notificationController.getUnreadCount);
+router.patch('/mark-all-read', notificationController.markAllRead);
+router.patch('/mark-read/:id', notificationController.markOneRead);
+
+
+//profile
+
+
+router.get('/profile', authController.getProfile);
+router.patch('/update-profile', authController.updateProfile);
+router.patch('/change-password', authController.changePassword);
 export default router;
