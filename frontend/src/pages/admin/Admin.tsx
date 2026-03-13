@@ -8,6 +8,7 @@ const navItems = [
   { to: '/admin/services', label: 'Services', icon: '🛠️' },
   { to: '/admin/crops', label: 'Crops', icon: '🌱' },
   { to: '/admin/requests', label: 'Service Requests', icon: '📋' },
+  { to: '/admin/profile', label: 'My Profile', icon: '👤' },
 ];
 
 export default function AdminLayout() {
@@ -23,7 +24,7 @@ export default function AdminLayout() {
   const SidebarContent = () => (
     <div className="flex flex-col h-full">
       {/* Logo */}
-      <div className="px-6 py-6 border-b border-green-800">
+      <div className="px-6 py-6 border-b border-gray-700">
         <div className="flex items-center gap-3">
           <div className="w-10 h-10 bg-green-400 rounded-xl flex items-center justify-center text-xl">
             🌾
@@ -47,7 +48,7 @@ export default function AdminLayout() {
               `flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all ${
                 isActive
                   ? 'bg-green-600 text-white shadow-lg shadow-green-900/30'
-                  : 'text-green-200 hover:bg-green-800 hover:text-white'
+                  : 'text-gray-400 hover:bg-gray-700 hover:text-white'
               }`
             }
           >
@@ -58,19 +59,19 @@ export default function AdminLayout() {
       </nav>
 
       {/* User info + logout */}
-      <div className="px-3 py-4 border-t border-green-800">
-        <div className="flex items-center gap-3 px-4 py-3 bg-green-800 rounded-xl mb-2">
+      <div className="px-3 py-4 border-t border-gray-700">
+        <div className="flex items-center gap-3 px-4 py-3 bg-gray-700 rounded-xl mb-2">
           <div className="w-9 h-9 bg-green-600 rounded-full flex items-center justify-center text-white font-bold text-sm">
             {user?.name?.charAt(0)?.toUpperCase() ?? 'A'}
           </div>
           <div className="flex-1 min-w-0">
             <p className="text-white text-sm font-medium truncate">{user?.name ?? 'Admin'}</p>
-            <p className="text-green-400 text-xs truncate">{user?.email ?? 'Administrator'}</p>
+            <p className="text-gray-400 text-xs truncate">{user?.email ?? 'Administrator'}</p>
           </div>
         </div>
         <button
           onClick={handleLogout}
-          className="w-full flex items-center gap-3 px-4 py-2.5 text-green-300 hover:text-white hover:bg-green-800 rounded-xl text-sm transition-all"
+          className="w-full flex items-center gap-3 px-4 py-2.5 text-gray-400 hover:text-white hover:bg-gray-700 rounded-xl text-sm transition-all"
         >
           <span>🚪</span> Logout
         </button>
@@ -79,7 +80,7 @@ export default function AdminLayout() {
   );
 
   return (
-    <div className="flex h-screen bg-gray-50 overflow-hidden">
+    <div className="flex h-screen bg-slate-100 overflow-hidden">
       {/* Mobile overlay */}
       {sidebarOpen && (
         <div
@@ -89,12 +90,12 @@ export default function AdminLayout() {
       )}
 
       {/* Sidebar — desktop */}
-      <aside className="hidden lg:flex flex-col w-64 bg-green-900 flex-shrink-0">
+      <aside className="hidden lg:flex flex-col w-64 bg-gray-800 flex-shrink-0">
         <SidebarContent />
       </aside>
 
       {/* Sidebar — mobile drawer */}
-      <aside className={`fixed inset-y-0 left-0 z-30 w-64 bg-green-900 flex flex-col transform transition-transform lg:hidden ${
+      <aside className={`fixed inset-y-0 left-0 z-30 w-64 bg-gray-800 flex flex-col transform transition-transform lg:hidden ${
         sidebarOpen ? 'translate-x-0' : '-translate-x-full'
       }`}>
         <SidebarContent />

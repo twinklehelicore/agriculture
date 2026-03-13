@@ -4,6 +4,7 @@ import {
   assignProvider,
   getProviders,
   rejectRequest,
+  setPriority,
 } from "../../api/admin";
 
 interface Request {
@@ -13,6 +14,7 @@ interface Request {
   farmId: number;
   serviceTypeId: number;
   status: string;
+  priority: string;
   details?: string;
   preferredSlot?: string;
   appliedAt: string;
@@ -48,6 +50,7 @@ export default function ServiceRequests() {
   const [assignLoading, setAssignLoading] = useState(false);
   const [rejecting, setRejecting] = useState<number | null>(null);
   const [rejectLoading, setRejectLoading] = useState(false);
+  const [priorityLoading, setPriorityLoading] = useState<number | null>(null);
   const [toast, setToast] = useState<Toast | null>(null);
 
   const showToast = (message: string, type: "success" | "error") => {
@@ -103,6 +106,23 @@ export default function ServiceRequests() {
     }
   };
 
+  const handlePriority = async (id: number, current: string) => {
+    const newPriority = current === 'URGENT' ? 'NORMAL' : 'URGENT';
+    setPriorityLoading(id);
+    try {
+      await setPriority(id, newPriority);
+      fetchAll();
+      showToast(
+        newPriority === 'URGENT' ? '⚠️ Marked as URGENT!' : '✅ Marked as NORMAL',
+        'success'
+      );
+    } catch {
+      showToast('Failed to update priority', 'error');
+    } finally {
+      setPriorityLoading(null);
+    }
+  };
+
   const statuses = [
     "ALL", "PENDING", "ASSIGNED", "APPROVED",
     "IN_PROGRESS", "COMPLETED", "REJECTED",
@@ -116,7 +136,7 @@ export default function ServiceRequests() {
   return (
     <div className="space-y-6">
 
-      {/* ── TOAST ── */}
+      {/* TOAST */}
       {toast && (
         <div className={`fixed top-6 right-6 z-50 flex items-center gap-3 px-5 py-4 rounded-2xl shadow-xl text-white text-sm font-medium transition-all ${
           toast.type === "success" ? "bg-green-700" : "bg-red-600"
@@ -129,9 +149,7 @@ export default function ServiceRequests() {
 
       <div>
         <h1 className="text-2xl font-bold text-gray-800">Service Requests</h1>
-        <p className="text-gray-500 text-sm mt-1">
-          View and assign providers to requests
-        </p>
+        <p className="text-gray-500 text-sm mt-1">View and assign providers to requests</p>
       </div>
 
       {/* Status Filter */}
@@ -151,7 +169,7 @@ export default function ServiceRequests() {
         ))}
       </div>
 
-      {/* ── ASSIGN MODAL ── */}
+      {/* ASSIGN MODAL */}
       {assigning !== null && (
         <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
           <div className="bg-white rounded-2xl shadow-xl w-full max-w-sm p-6 space-y-4">
@@ -160,17 +178,13 @@ export default function ServiceRequests() {
               <button onClick={() => setAssigning(null)}
                 className="text-gray-400 hover:text-gray-600 text-xl">✕</button>
             </div>
-
             <div className="px-4 py-3 bg-green-50 border border-green-200 rounded-xl">
               <p className="text-sm text-green-700">
                 Assigning provider to <span className="font-semibold">Request #{assigning}</span>
               </p>
             </div>
-
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Select Provider
-              </label>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Select Provider</label>
               <select
                 value={selectedProvider}
                 onChange={(e) => setSelectedProvider(e.target.value)}
@@ -184,7 +198,6 @@ export default function ServiceRequests() {
                 ))}
               </select>
             </div>
-
             <div className="flex gap-3 pt-2">
               <button onClick={() => setAssigning(null)}
                 className="flex-1 py-2.5 border border-gray-200 rounded-lg text-sm text-gray-600 hover:bg-gray-50">
@@ -202,7 +215,7 @@ export default function ServiceRequests() {
         </div>
       )}
 
-      {/* ── REJECT MODAL ── */}
+      {/* REJECT MODAL */}
       {rejecting !== null && (
         <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
           <div className="bg-white rounded-2xl shadow-xl w-full max-w-sm p-6 space-y-4">
@@ -211,7 +224,6 @@ export default function ServiceRequests() {
               <button onClick={() => setRejecting(null)}
                 className="text-gray-400 hover:text-gray-600 text-xl">✕</button>
             </div>
-
             <div className="px-4 py-3 bg-red-50 border border-red-200 rounded-xl">
               <p className="text-sm text-red-700">
                 Are you sure you want to reject{" "}
@@ -219,7 +231,6 @@ export default function ServiceRequests() {
                 This action cannot be undone.
               </p>
             </div>
-
             <div className="flex gap-3 pt-2">
               <button onClick={() => setRejecting(null)}
                 className="flex-1 py-2.5 border border-gray-200 rounded-lg text-sm text-gray-600 hover:bg-gray-50">
@@ -237,7 +248,7 @@ export default function ServiceRequests() {
         </div>
       )}
 
-      {/* ── TABLE ── */}
+      {/* TABLE */}
       {loading ? (
         <div className="text-center py-16 text-gray-400">Loading requests...</div>
       ) : (
@@ -246,9 +257,8 @@ export default function ServiceRequests() {
             <table className="w-full text-sm">
               <thead className="bg-gray-50 border-b border-gray-200">
                 <tr>
-                  {["#", "Farmer ID", "Farm ID", "Slot", "Status", "Applied", "Actions"].map((h) => (
-                    <th key={h}
-                      className="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wide">
+                  {["#", "Farmer ID", "Farm ID", "Priority", "Slot", "Status", "Applied", "Actions"].map((h) => (
+                    <th key={h} className="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wide">
                       {h}
                     </th>
                   ))}
@@ -257,16 +267,30 @@ export default function ServiceRequests() {
               <tbody className="divide-y divide-gray-100">
                 {filtered.length === 0 ? (
                   <tr>
-                    <td colSpan={7} className="text-center py-12 text-gray-400">
+                    <td colSpan={8} className="text-center py-12 text-gray-400">
                       No requests found
                     </td>
                   </tr>
                 ) : (
                   filtered.map((r) => (
-                    <tr key={r.id} className="hover:bg-gray-50 transition-colors">
+                    <tr key={r.id} className={`hover:bg-gray-50 transition-colors ${r.priority === 'URGENT' ? 'border-l-4 border-l-red-500' : ''}`}>
                       <td className="px-4 py-3 text-gray-400">{r.id}</td>
                       <td className="px-4 py-3 text-gray-700">#{r.farmerId}</td>
                       <td className="px-4 py-3 text-gray-700">#{r.farmId}</td>
+
+                      {/* Priority Badge */}
+                      <td className="px-4 py-3">
+                        {r.priority === 'URGENT' ? (
+                          <span className="px-2.5 py-1 rounded-full text-xs font-bold bg-red-100 text-red-700 animate-pulse">
+                            ⚠️ URGENT
+                          </span>
+                        ) : (
+                          <span className="px-2.5 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-500">
+                            NORMAL
+                          </span>
+                        )}
+                      </td>
+
                       <td className="px-4 py-3 text-gray-600">{r.preferredSlot || "—"}</td>
                       <td className="px-4 py-3">
                         <span className={`px-2.5 py-1 rounded-full text-xs font-medium ${statusColor[r.status] || "bg-gray-100 text-gray-600"}`}>
@@ -277,9 +301,9 @@ export default function ServiceRequests() {
                         {new Date(r.appliedAt).toLocaleDateString("en-IN")}
                       </td>
 
-                      {/* ── ACTION BUTTONS ── */}
+                      {/* ACTION BUTTONS */}
                       <td className="px-4 py-3">
-                        <div className="flex gap-2">
+                        <div className="flex gap-2 flex-wrap">
                           {r.status === "PENDING" && (
                             <button
                               onClick={() => { setAssigning(r.id); setSelectedProvider(""); }}
@@ -294,9 +318,23 @@ export default function ServiceRequests() {
                               Reject
                             </button>
                           )}
+                          {/* Priority Toggle — only for non-completed/rejected */}
+                          {!['COMPLETED', 'REJECTED'].includes(r.status) && (
+                            <button
+                              onClick={() => handlePriority(r.id, r.priority)}
+                              disabled={priorityLoading === r.id}
+                              className={`px-3 py-1.5 rounded-lg text-xs font-medium whitespace-nowrap transition-all disabled:opacity-50 ${
+                                r.priority === 'URGENT'
+                                  ? 'bg-red-50 text-red-600 hover:bg-red-100'
+                                  : 'bg-orange-50 text-orange-600 hover:bg-orange-100'
+                              }`}>
+                              {priorityLoading === r.id
+                                ? '...'
+                                : r.priority === 'URGENT' ? '✅ Set Normal' : '⚠️ Set Urgent'}
+                            </button>
+                          )}
                         </div>
                       </td>
-
                     </tr>
                   ))
                 )}

@@ -87,7 +87,7 @@ export default function ProviderDashboard() {
         ) : (
           <div className="space-y-3">
             {activeJobs.slice(0, 5).map(job => (
-              <div key={job.id} className="flex items-center justify-between p-4 bg-gray-50 rounded-xl">
+              <div key={job.id} className="flex items-center justify-between p-4 bg-slate-100 rounded-xl">
                 <div>
                   <p className="font-medium text-gray-800 text-sm">Job #{job.id}</p>
                   <p className="text-xs text-gray-500 mt-0.5">Farm #{job.farmId} · {job.preferredSlot ?? 'No slot'}</p>

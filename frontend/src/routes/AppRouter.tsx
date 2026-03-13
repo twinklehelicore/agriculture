@@ -16,6 +16,9 @@ import AvailableServices from '../pages/farmer/AvailableService';
 import ProviderLayout from '../pages/provider/Provider';
 import ProviderHome from '../pages/provider/ProviderDashboard';
 import MyJobs from '../pages/provider/MyJob';
+import AdminProfile from '../pages/admin/Profile';
+import ProviderProfile from '../pages/provider/Profile';
+import FarmerProfile from '../pages/farmer/Profile';
 
 export default function AppRouter() {
   return (
@@ -31,6 +34,10 @@ export default function AppRouter() {
           <Route path="services" element={<Services />} />
           <Route path="crops" element={<Crops />} />
           <Route path="requests" element={<ServiceRequests />} />
+          <Route path= "profile" element={ <AdminProfile /> } />
+
+
+
         </Route>
 
         <Route path="/farmer" element={<ProtectedRoute role="FARMER"><FarmerLayout /></ProtectedRoute>}>
@@ -38,12 +45,15 @@ export default function AppRouter() {
           <Route path="farms" element={<MyFarms />} />
           <Route path="requests" element={<MyRequests />} />
           <Route path="services" element={<AvailableServices />} />
+          <Route path= "profile" element={ <FarmerProfile /> } />
+         
         </Route>
 
         {/* Provider routes */}
         <Route path="/provider" element={<ProtectedRoute role="PROVIDER"><ProviderLayout /></ProtectedRoute>}>
           <Route index element={<ProviderHome />} />
           <Route path="jobs" element={<MyJobs />} />
+          <Route path= "profile" element={ <ProviderProfile /> } />
         </Route>
       </Routes>
     </BrowserRouter>

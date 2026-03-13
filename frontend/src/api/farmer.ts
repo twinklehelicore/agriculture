@@ -15,3 +15,7 @@ export const deleteRequest = (id: number) => api.delete(`/farmer/delete-my-servi
 // Crops and Services (read only)
 export const getCrops = () => api.get('/farmer/list-crop');
 export const getServices = () => api.get('/farmer/list-services');
+
+//profile
+export const getProfile = () => api.get('/farmer/profile');
+export const updateProfile = (data: object) => api.patch('/farmer/update-profile', data);

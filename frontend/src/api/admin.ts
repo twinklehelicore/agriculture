@@ -25,3 +25,15 @@ export const getCrops = () => api.get('/admin/list-crop');
 export const createCrop = (data: object) => api.post('/admin/create-crop', data);
 export const updateCrop = (id: number, data: object) => api.patch(`/admin/update-crop/${id}`, data);
 export const deleteCrop = (id: number) => api.delete(`/admin/delete-crop/${id}`);
+
+//notification
+export const setPriority = (id: number, priority: string) =>
+  api.patch(`/admin/set-priority/${id}`, { priority });
+export const getAdminNotifications = () => api.get('/admin/my-notifications');
+export const getAdminUnreadCount = () => api.get('/admin/unread-count');
+export const markAdminAllRead = () => api.patch('/admin/mark-all-read');
+
+//profile
+export const getProfile = () => api.get('/admin/profile');
+export const updateProfile = (data: object) => api.patch('/admin/update-profile', data);
+export const changePassword = (data: object) => api.patch('/admin/change-password', data);
