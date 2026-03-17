@@ -1,10 +1,5 @@
 import { useEffect, useState } from "react";
-import {
-  getUsers,
-  getServices,
-  getCrops,
-  getAllRequests,
-} from "../../api/admin";
+import { getUsers, getServices, getCrops, getAllRequests, getCategories } from '../../api/admin';
 import {
   PieChart,
   Pie,
@@ -25,6 +20,7 @@ interface Stats {
   users: number;
   farmers: number;
   providers: number;
+  categories: number;
   services: number;
   crops: number;
   requests: number;
@@ -41,6 +37,7 @@ export default function Dashboard() {
     users: 0,
     farmers: 0,
     providers: 0,
+    categories: 0,
     services: 0,
     crops: 0,
     requests: 0,
@@ -57,12 +54,14 @@ export default function Dashboard() {
   useEffect(() => {
     const fetchStats = async () => {
       try {
-        const [usersRes, servicesRes, cropsRes, requestsRes] =
+        const [usersRes, categoriesRes, servicesRes, cropsRes, requestsRes ] =
           await Promise.all([
             getUsers(),
+            getCategories(),
             getServices(),
             getCrops(),
             getAllRequests(),
+            
           ]);
 
         const users = usersRes.data;
@@ -73,6 +72,7 @@ export default function Dashboard() {
           farmers: users.filter((u: any) => u.role?.name === "FARMER").length,
           providers: users.filter((u: any) => u.role?.name === "PROVIDER")
             .length,
+          categories: categoriesRes.data.length,
           services: servicesRes.data.length,
           crops: cropsRes.data.length,
           requests: requests.length,
@@ -151,11 +151,18 @@ export default function Dashboard() {
       border: "border-teal-100",
     },
     {
+      label: "Categories",
+      value: stats.categories,
+      icon: "🗂️",
+      color: "bg-violet-50 text-violet-600",
+      border: "border-violet-100",
+    },
+    {
       label: "Services",
       value: stats.services,
       icon: "🛠️",
-      color: "bg-violet-50 text-violet-600",
-      border: "border-violet-100",
+      color: "bg-indigo-50 text-indigo-600",
+      border: "border-indigo-100",
     },
     {
       label: "Crops",
@@ -188,13 +195,13 @@ export default function Dashboard() {
   ];
 
   const pieData = [
-  { name: 'Pending',     value: stats.pending,    color: '#22C55E' },
-  { name: 'Assigned',    value: stats.assigned,   color: '#16A34A' },
-  { name: 'Approved',    value: stats.approved,   color: '#15803D' },
-  { name: 'In Progress', value: stats.inProgress, color: '#166534' },
-  { name: 'Completed',   value: stats.completed,  color: '#14532D' },
-  { name: 'Rejected',    value: stats.rejected,   color: '#1E2532' },
-].filter(d => d.value > 0);
+    { name: "Pending", value: stats.pending, color: "#22C55E" },
+    { name: "Assigned", value: stats.assigned, color: "#16A34A" },
+    { name: "Approved", value: stats.approved, color: "#15803D" },
+    { name: "In Progress", value: stats.inProgress, color: "#166534" },
+    { name: "Completed", value: stats.completed, color: "#14532D" },
+    { name: "Rejected", value: stats.rejected, color: "#1E2532" },
+  ].filter((d) => d.value > 0);
 
   const userBarData = [
     { name: "Farmers", count: stats.farmers },
@@ -202,13 +209,13 @@ export default function Dashboard() {
   ];
 
   const statusBarData = [
-  { status: 'Pending',     count: stats.pending,    fill: '#22C55E' },
-  { status: 'Assigned',    count: stats.assigned,   fill: '#16A34A' },
-  { status: 'Approved',    count: stats.approved,   fill: '#15803D' },
-  { status: 'In Progress', count: stats.inProgress, fill: '#166534' },
-  { status: 'Completed',   count: stats.completed,  fill: '#14532D' },
-  { status: 'Rejected',    count: stats.rejected,   fill: '#1E2532' },
-];
+    { status: "Pending", count: stats.pending, fill: "#22C55E" },
+    { status: "Assigned", count: stats.assigned, fill: "#16A34A" },
+    { status: "Approved", count: stats.approved, fill: "#15803D" },
+    { status: "In Progress", count: stats.inProgress, fill: "#166534" },
+    { status: "Completed", count: stats.completed, fill: "#14532D" },
+    { status: "Rejected", count: stats.rejected, fill: "#1E2532" },
+  ];
 
   if (loading) {
     return (
@@ -321,8 +328,14 @@ export default function Dashboard() {
               <XAxis dataKey="month" tick={{ fontSize: 12 }} />
               <YAxis allowDecimals={false} tick={{ fontSize: 12 }} />
               <Tooltip formatter={(value) => [`${value} requests`, ""]} />
-              <Line type="monotone" dataKey="requests" stroke="#22C55E" strokeWidth={3}
-  dot={{ fill: '#22C55E', r: 4 }} activeDot={{ r: 6 }} />
+              <Line
+                type="monotone"
+                dataKey="requests"
+                stroke="#22C55E"
+                strokeWidth={3}
+                dot={{ fill: "#22C55E", r: 4 }}
+                activeDot={{ r: 6 }}
+              />
             </LineChart>
           </ResponsiveContainer>
         </div>

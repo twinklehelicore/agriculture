@@ -9,12 +9,15 @@ export default function NotificationBell() {
   const [unread, setUnread] = useState(0);
   const ref = useRef<HTMLDivElement>(null);
   const role = user?.role ?? '';
+  console.log('Bell role:', role, 'User:', user);
 
   const fetchCount = async () => {
     try {
       const res = await getUnreadCount(role);
       setUnread(res.data.count);
-    } catch {}
+    } catch (err: any){
+      console.log('Count error:', err);
+    }
   };
 
   const fetchNotifications = async () => {
@@ -25,7 +28,7 @@ export default function NotificationBell() {
   };
 
   useEffect(() => {
-    if (!role || role === 'ADMIN') return;
+    if (!role) return;
     fetchCount();
     const interval = setInterval(fetchCount, 30000); // poll every 30s
     return () => clearInterval(interval);
@@ -72,7 +75,7 @@ export default function NotificationBell() {
     return `${Math.floor(hrs / 24)}d ago`;
   };
 
-  if (!role || role === 'ADMIN') return null;
+  if (!role) return null;
 
   return (
     <div className="relative" ref={ref}>
@@ -89,7 +92,7 @@ export default function NotificationBell() {
         )}
       </button>
 
-      {/* Dropdown */}
+      
        {/* Dropdown */}
       {open && (
         <div className="absolute right-0 top-12 w-80 bg-white rounded-2xl shadow-xl border border-gray-200 z-[9999] overflow-hidden">

@@ -19,3 +19,7 @@ export const getServices = () => api.get('/farmer/list-services');
 //profile
 export const getProfile = () => api.get('/farmer/profile');
 export const updateProfile = (data: object) => api.patch('/farmer/update-profile', data);
+
+//category
+
+export const getCategories = () => api.get('/farmer/list-categories');

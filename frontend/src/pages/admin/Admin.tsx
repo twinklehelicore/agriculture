@@ -1,14 +1,18 @@
-import { useState } from 'react';
-import { NavLink, Outlet, useNavigate } from 'react-router-dom';
-import { useAuth } from '../../context/AuthContext';
+import { useState } from "react";
+import { NavLink, Outlet, useNavigate } from "react-router-dom";
+import { useAuth } from "../../context/AuthContext";
+import NotificationBell from "../../components/NotificationBell";
 
 const navItems = [
-  { to: '/admin', label: 'Dashboard', icon: '📊', end: true },
-  { to: '/admin/users', label: 'Users', icon: '👥' },
-  { to: '/admin/services', label: 'Services', icon: '🛠️' },
-  { to: '/admin/crops', label: 'Crops', icon: '🌱' },
-  { to: '/admin/requests', label: 'Service Requests', icon: '📋' },
-  { to: '/admin/profile', label: 'My Profile', icon: '👤' },
+  { to: "/admin", label: "Dashboard", icon: "📊", end: true },
+  { to: "/admin/users", label: "Users", icon: "👥" },
+  { to: '/admin/categories', label: 'Categories', icon: '🗂️' },
+  { to: "/admin/services", label: "Services", icon: "🛠️" },
+  { to: "/admin/crops", label: "Crops", icon: "🌱" },
+  { to: "/admin/requests", label: "Service Requests", icon: "📋" },
+  { to: "/admin/profile", label: "My Profile", icon: "👤" },
+  { to: "/admin/track", label: "Track Service", icon: "🗺️" },
+  
 ];
 
 export default function AdminLayout() {
@@ -18,7 +22,7 @@ export default function AdminLayout() {
 
   const handleLogout = () => {
     logout();
-    navigate('/login');
+    navigate("/login");
   };
 
   const SidebarContent = () => (
@@ -30,7 +34,9 @@ export default function AdminLayout() {
             🌾
           </div>
           <div>
-            <h1 className="text-white font-bold text-lg leading-none">AgriOwn</h1>
+            <h1 className="text-white font-bold text-lg leading-none">
+              AgriOwn
+            </h1>
             <p className="text-green-400 text-xs mt-0.5">Admin Panel</p>
           </div>
         </div>
@@ -38,7 +44,7 @@ export default function AdminLayout() {
 
       {/* Nav */}
       <nav className="flex-1 px-3 py-4 space-y-1">
-        {navItems.map(item => (
+        {navItems.map((item) => (
           <NavLink
             key={item.to}
             to={item.to}
@@ -47,8 +53,8 @@ export default function AdminLayout() {
             className={({ isActive }) =>
               `flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all ${
                 isActive
-                  ? 'bg-green-600 text-white shadow-lg shadow-green-900/30'
-                  : 'text-gray-400 hover:bg-gray-700 hover:text-white'
+                  ? "bg-green-600 text-white shadow-lg shadow-green-900/30"
+                  : "text-gray-400 hover:bg-gray-700 hover:text-white"
               }`
             }
           >
@@ -62,11 +68,15 @@ export default function AdminLayout() {
       <div className="px-3 py-4 border-t border-gray-700">
         <div className="flex items-center gap-3 px-4 py-3 bg-gray-700 rounded-xl mb-2">
           <div className="w-9 h-9 bg-green-600 rounded-full flex items-center justify-center text-white font-bold text-sm">
-            {user?.name?.charAt(0)?.toUpperCase() ?? 'A'}
+            {user?.name?.charAt(0)?.toUpperCase() ?? "A"}
           </div>
           <div className="flex-1 min-w-0">
-            <p className="text-white text-sm font-medium truncate">{user?.name ?? 'Admin'}</p>
-            <p className="text-gray-400 text-xs truncate">{user?.email ?? 'Administrator'}</p>
+            <p className="text-white text-sm font-medium truncate">
+              {user?.name ?? "Admin"}
+            </p>
+            <p className="text-gray-400 text-xs truncate">
+              {user?.email ?? "Administrator"}
+            </p>
           </div>
         </div>
         <button
@@ -95,9 +105,11 @@ export default function AdminLayout() {
       </aside>
 
       {/* Sidebar — mobile drawer */}
-      <aside className={`fixed inset-y-0 left-0 z-30 w-64 bg-gray-800 flex flex-col transform transition-transform lg:hidden ${
-        sidebarOpen ? 'translate-x-0' : '-translate-x-full'
-      }`}>
+      <aside
+        className={`fixed inset-y-0 left-0 z-30 w-64 bg-gray-800 flex flex-col transform transition-transform lg:hidden ${
+          sidebarOpen ? "translate-x-0" : "-translate-x-full"
+        }`}
+      >
         <SidebarContent />
       </aside>
 
@@ -114,14 +126,17 @@ export default function AdminLayout() {
             </button>
             <div>
               <h2 className="text-gray-800 font-semibold text-lg">
-                Hello, {user?.name ?? 'Admin'} 👋
+                Hello, {user?.name ?? "Admin"} 👋
               </h2>
-              <p className="text-gray-400 text-xs">Welcome back to AgriOwn Admin</p>
+              <p className="text-gray-400 text-xs">
+                Welcome back to AgriOwn Admin
+              </p>
             </div>
           </div>
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-3 relative z-[9999]">
+            <NotificationBell />
             <div className="w-9 h-9 bg-green-700 rounded-full flex items-center justify-center text-white font-bold text-sm">
-              {user?.name?.charAt(0)?.toUpperCase() ?? 'A'}
+              {user?.name?.charAt(0)?.toUpperCase() ?? "A"}
             </div>
           </div>
         </header>

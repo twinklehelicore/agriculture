@@ -37,3 +37,14 @@ export const markAdminAllRead = () => api.patch('/admin/mark-all-read');
 export const getProfile = () => api.get('/admin/profile');
 export const updateProfile = (data: object) => api.patch('/admin/update-profile', data);
 export const changePassword = (data: object) => api.patch('/admin/change-password', data);
+
+//logs
+export const getTrackService = () => api.get('/admin/track-service');
+export const getLogsByRequest = (id: number) => api.get(`/admin/track-service/${id}`);
+
+//category
+// Categories
+export const getCategories = () => api.get('/admin/list-categories');
+export const createCategory = (data: object) => api.post('/admin/create-category', data);
+export const updateCategory = (id: number, data: object) => api.patch(`/admin/update-category/${id}`, data);
+export const deleteCategory = (id: number) => api.delete(`/admin/delete-category/${id}`);

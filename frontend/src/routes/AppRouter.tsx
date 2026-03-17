@@ -19,6 +19,9 @@ import MyJobs from '../pages/provider/MyJob';
 import AdminProfile from '../pages/admin/Profile';
 import ProviderProfile from '../pages/provider/Profile';
 import FarmerProfile from '../pages/farmer/Profile';
+import TrackService from '../pages/admin/TrackService';
+import Categories from '../pages/admin/Categories';
+
 
 export default function AppRouter() {
   return (
@@ -35,6 +38,8 @@ export default function AppRouter() {
           <Route path="crops" element={<Crops />} />
           <Route path="requests" element={<ServiceRequests />} />
           <Route path= "profile" element={ <AdminProfile /> } />
+          <Route path= "track" element= { <TrackService /> } />
+          <Route path="categories" element={<Categories />} />
 
 
 

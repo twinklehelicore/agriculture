@@ -9,3 +9,7 @@ export const rejectRequest = (id: number) => api.patch(`/provider/reject-request
 //profile
 export const getProfile = () => api.get('/provider/profile');
 export const updateProfile = (data: object) => api.patch('/provider/update-profile', data);
+
+//log
+export const addLog = (id: number, note: string) =>
+  api.post(`/provider/add-log/${id}`, { note });
