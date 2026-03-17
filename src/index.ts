@@ -12,8 +12,7 @@ const PORT = Number(process.env.PORT) || 3000;
 
 // Middleware
 app.use(cors({ origin: [
-  "http://localhost:5173",
-  "https://https://qknt4gk5-5173.inc1.devtunnels.ms"
+  "http://localhost:5173"
 ] }));
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ limit: '10mb', extended: true }));

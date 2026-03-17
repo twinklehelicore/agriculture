@@ -7,12 +7,21 @@ import auth from "../middleware/auth";
 import notificationController from "../controllers/notificationController";
 import authController from "../controllers/authController";
 
+
+
 const router = Router();
 
 router.use(auth('ADMIN'));
+
+//service category
+router.post('/create-category', validate(adminSchema.createCategorySchema), adminController.createCategory),
+router.get('/list-categories', adminController.listCategories),
+router.patch('/update-category/:id', validate(adminSchema.categoryIdSchema.merge(adminSchema.updateCategorySchema)), adminController.updateCategory),
+router.delete('/delete-category/:id', validate(adminSchema.categoryIdSchema), adminController.deleteCategory),
+
 //service routes
 router.post('/add-service', validate(adminSchema.createServiceSchema), adminController.createService),
-router.patch('/update-service/:id', validate(adminSchema.serviceIdSchema.merge(adminSchema.updateServiceSchema)), adminController.updateService);
+router.patch('/update-service/:id', validate(adminSchema.serviceIdSchema.merge(adminSchema.updateServiceSchema)), adminController.updateService),
 router.get('/list-service', adminController.listServices),
 router.get('/list-service/:id', validate(adminSchema.serviceIdSchema), adminController.getServiceById )
 router.delete('/delete-service/:id', validate(adminSchema.serviceIdSchema), adminController.deleteService),
@@ -53,4 +62,10 @@ router.patch('/mark-read/:id', notificationController.markOneRead);
 router.get('/profile', authController.getProfile);
 router.patch('/update-profile', authController.updateProfile);
 router.patch('/change-password', authController.changePassword);
+
+//logs
+
+router.get('/track-service', adminController.getAllLogs);
+router.get('/track-service/:id', adminController.getLogsByRequest);
+
 export default router;

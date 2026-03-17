@@ -26,8 +26,12 @@ router.get('/unread-count', notificationController.getUnreadCount);
 router.patch('/mark-all-read', notificationController.markAllRead);
 router.patch('/mark-read/:id', notificationController.markOneRead);
 
-
+//profile
 router.get('/profile', authController.getProfile);
 router.patch('/update-profile', authController.updateProfile);
+
+//add logs
+router.post('/add-log/:id', providerControler.addLog);
+
 
 export default router;

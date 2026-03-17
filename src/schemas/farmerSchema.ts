@@ -5,7 +5,7 @@ const farmIdSchema = z.object({
 });
 
 const serviceIdSchema = z.object({
-    id: z.coerce.number().int().positive('SErvide id must be positive')
+    id: z.coerce.number().int().positive('Service id must be positive')
 });
 
 const createFarmSchema = z.object({

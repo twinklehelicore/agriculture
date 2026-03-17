@@ -51,17 +51,30 @@ model Crop {
   @@map("crop")
 }
 
+model ServiceCategory {
+  id          Int           @id @default(autoincrement())
+  name        String        @db.VarChar(120)
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+
+  services    ServiceType[]
+
+  @@map("service_category")
+}
+
 model ServiceType {
   id          Int   @id @default(autoincrement())
   name        String   @db.VarChar(120)     
   price       Decimal? @db.Decimal(10, 2)                      
   image       String?  @db.LongText
   description String?  @db.Text
-  unit        String?                       
+  unit        String?
+  categoryId  Int?                
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
   requests    ServiceRequest[]
+  category    ServiceCategory? @relation(fields: [categoryId], references: [id])   
 
   @@map("service_type")
   
@@ -86,6 +99,7 @@ model User {
   sentRequests ServiceRequest[] @relation("FarmerToRequest")
   receivedJobs ServiceRequest[] @relation("ProviderToRequest")
   notifications Notification[]
+  providerLogs ServiceLog[] @relation("ProviderLogs")
 
   @@map("user")
 }
@@ -147,6 +161,7 @@ model ServiceRequest {
   provider          User?               @relation("ProviderToRequest", fields: [providerId], references: [id])
   serviceType          ServiceType     @relation(fields: [serviceTypeId], references: [id])
   farm          Farm          @relation(fields: [farmId], references: [id])
+  logs   ServiceLog[]
 
   @@map("service_request")
                     
@@ -166,4 +181,17 @@ model Notification {
   user      User     @relation(fields: [userId], references: [id])
 
   @@map("notification")
+}
+
+model ServiceLog {
+  id               Int            @id @default(autoincrement())
+  serviceRequestId Int
+  providerId       Int
+  note             String         @db.Text
+  createdAt        DateTime       @default(now())
+
+  serviceRequest   ServiceRequest @relation(fields: [serviceRequestId], references: [id])
+  provider         User           @relation("ProviderLogs", fields: [providerId], references: [id])
+
+  @@map("service_log")
 }

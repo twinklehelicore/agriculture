@@ -4,6 +4,67 @@ import prisma from "../lib/prisma";
 import logger from "../utils/logger";
 import { createNotification } from "../utils/notify";
 
+
+//service category crud
+
+const createCategory = async (req: Request, res: Response) => {
+  try {
+    const data = req.body;
+    await prisma.serviceCategory.create({ data });
+    return res.status(200).json("Category created successfully");
+  } catch (err: any) {
+    logger.error("Unable to create category", err);
+    return res.status(500).json("Category not created");
+  }
+};
+
+const listCategories = async (req: Request, res: Response) => {
+  try {
+    const categories = await prisma.serviceCategory.findMany({
+      orderBy: { id: "asc" },
+      include: { services: { select: { id: true, name: true } } }
+    });
+    return res.status(200).json(categories);
+  } catch (err: any) {
+    logger.error("Unable to list categories", err);
+    return res.status(500).json("Categories not listed");
+  }
+};
+
+const updateCategory = async (req: Request, res: Response) => {
+  try {
+    const { id } = req.params;
+    const { name } = req.body; 
+    await prisma.serviceCategory.update({
+      where: { id: Number(id) },
+      data: { name }
+    });
+    return res.status(200).json("Category updated successfully");
+  } catch (err: any) {
+    logger.error("Unable to update category", err);
+    return res.status(500).json("Category not updated");
+  }
+};
+
+const deleteCategory = async (req: Request, res: Response) => {
+  try {
+    const { id } = req.params;
+    // First unlink all services from this category
+    await prisma.serviceType.updateMany({
+      where: { categoryId: Number(id) },
+      data: { categoryId: null }
+    });
+    // Then delete the category
+    await prisma.serviceCategory.delete({
+      where: { id: Number(id) }
+    });
+    return res.status(200).json("Category deleted successfully");
+  } catch (err: any) {
+    logger.error("Unable to delete category", err);
+    return res.status(500).json("Category not deleted");
+  }
+};
+
 //service crud
 
 const createService = async (req: Request, res: Response) => {
@@ -220,11 +281,20 @@ const assignProvider = async (req: Request, res: Response) => {
       },
       include: { farmer: true, serviceType: true },
     });
-    await createNotification(
-      request.farmerId,
-      "Request Assigned",
-      `Your ${request.serviceType.name} request has been assigned to a provider.`,
-    );
+    await prisma.notification.createMany({
+      data: [
+        {
+          userId: request.farmerId,
+          title: "Request Assigned",
+          message: `Your ${request.serviceType.name} request #${request.id} has been assigned to a provider.`,
+        },
+        {
+          userId: providerId,
+          title: "New Job Assigned",
+          message: `You have been assigned a new ${request.serviceType.name} job #${request.id}.`,
+        },
+      ],
+    });
 
     return res.status(200).json("Provider has assigned");
   } catch (err: any) {
@@ -243,8 +313,8 @@ const rejectRequest = async (req: Request, res: Response) => {
     });
     await createNotification(
       request.farmerId,
-      'Request Rejected',
-      `Your  ${request.serviceType.name} request has been rejected by admin.`
+      "Request Rejected",
+      `Your  ${request.serviceType.name} request has been rejected by admin.`,
     );
     return res.status(200).json("Request rejected");
   } catch (err: any) {
@@ -348,27 +418,73 @@ const setPriority = async (req: Request, res: Response) => {
     const request = await prisma.serviceRequest.update({
       where: { id: Number(id) },
       data: { priority },
-      include: { serviceType: true }
+      include: { serviceType: true },
     });
 
     if (request.providerId) {
       await createNotification(
         request.providerId,
-        priority === 'URGENT' ? 'Job Marked URGENT' : 'Job Priority Updated',
-        `Your ${request.serviceType.name} job has been marked as ${priority}.`
+        priority === "URGENT" ? "Job Marked URGENT" : "Job Priority Updated",
+        `Your ${request.serviceType.name} job has been marked as ${priority}.`,
       );
     }
 
-    return res.status(200).json('Priority updated');
+    return res.status(200).json("Priority updated");
   } catch (err: any) {
-    logger.error('Unable to set priority', err);
-    return res.status(500).json('Priority not updated');
+    logger.error("Unable to set priority", err);
+    return res.status(500).json("Priority not updated");
   }
 };
 
+//get log by request
+const getLogsByRequest = async (req: Request, res: Response) => {
+  try {
+    const { id } = req.params;
+    const logs = await prisma.serviceLog.findMany({
+      where: { serviceRequestId: Number(id) },
+      orderBy: { createdAt: "asc" },
+      include: { provider: { select: { name: true, mobile: true } } },
+    });
+    return res.status(200).json(logs);
+  } catch (err: any) {
+    logger.error("Get logs error:", err);
+    return res.status(500).json({ error: "Failed to fetch logs" });
+  }
+};
+//get all logs
 
+const getAllLogs = async (req: Request, res: Response) => {
+  try {
+    const requests = await prisma.serviceRequest.findMany({
+      where: {
+        status: {
+          notIn: ["REJECTED"],
+        },
+      },
+      orderBy: { id: "desc" },
+      include: {
+        serviceType: { select: { name: true } },
+        farmer: { select: { name: true, mobile: true } },
+        provider: { select: { name: true, mobile: true } },
+        farm: { select: { name: true, address: true } },
+        logs: {
+          orderBy: { createdAt: "asc" },
+          include: { provider: { select: { name: true } } },
+        },
+      },
+    });
+    return res.status(200).json(requests);
+  } catch (err: any) {
+    logger.error("Get all logs error:", err);
+    return res.status(500).json({ error: "Failed to fetch logs" });
+  }
+};
 
 export default {
-  createService, listServices, updateService, getServiceById, deleteService, addUser, listUser, listFarmer, listProviders, assignProvider, rejectRequest, updateUser, deleteUser,
-  listAllServiceRequest, createCrop, updateCrop, listCrop, listCropById, deleteCrop, setPriority
+  createCategory, listCategories, updateCategory, deleteCategory,
+  createService, listServices, updateService, getServiceById, deleteService,
+  addUser, listUser, listFarmer, listProviders, assignProvider, rejectRequest,
+  updateUser, deleteUser, listAllServiceRequest, 
+  createCrop, updateCrop, listCrop, listCropById, deleteCrop,
+  setPriority, getLogsByRequest, getAllLogs
 };

@@ -1,5 +1,15 @@
 import { z } from 'zod';
 
+const categoryIdSchema = z.object({
+  id: z.coerce.number().int().positive('Category ID must be a positive number')
+});
+
+const createCategorySchema = z.object({
+  name: z.string().min(2, 'Name must be at least 2 characters').max(120)
+});
+
+const updateCategorySchema = createCategorySchema.partial().strict();
+
 const serviceIdSchema = z.object({
     id: z.coerce.number().int().positive('Service request id must be positive')
 });
@@ -18,7 +28,8 @@ const createServiceSchema = z.object({
     price: z.number().positive('Price must be positive').optional(),
     image: z.string().url('Image muste be valid string').optional(),
     description: z.string().trim().optional(),
-    unit: z.string().trim().max(50).optional()
+    unit: z.string().trim().max(50).optional(),
+    categoryId: z.coerce.number().int().positive().optional(),
 
 });
 const updateServiceSchema = createServiceSchema.partial().strict()
@@ -39,8 +50,6 @@ const updateUserSchema = z.object({
 });
 
 
-
-
 const cropIdSchema = z.object({
   id: z.coerce.number().int().positive('Crop ID must be a positive number')
 });
@@ -54,4 +63,4 @@ const updateCropSchema = createCropSchema.partial().strict();
 
 
 
-export default{ serviceIdSchema, userIdSchema, providerIdSchema, createServiceSchema, updateServiceSchema, createUserSchema, updateUserSchema, cropIdSchema, createCropSchema, updateCropSchema}
+export default{categoryIdSchema, createCategorySchema, updateCategorySchema, serviceIdSchema, userIdSchema, providerIdSchema, createServiceSchema, updateServiceSchema, createUserSchema, updateUserSchema, cropIdSchema, createCropSchema, updateCropSchema}
