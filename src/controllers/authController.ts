@@ -4,6 +4,7 @@ import prisma from '../lib/prisma';
 import logger from "../utils/logger";
 import jwt from "jsonwebtoken";
 import bycrpt from 'bcryptjs';
+import { sendEmailOtp } from '../utils/email';
 
 
 
@@ -44,34 +45,31 @@ const register = async (req: Request, res: Response) => {
   
 const sendOtp = async (req: Request, res: Response) => {
   try {
-    const { mobile } = req.body;
+    const { email } = req.body;
 
     const user = await prisma.user.findFirst({
-      where: { mobile },
+      where: { email },
       include: { role: true },
     });
 
-    if (!user) {
-      return res.status(400).json({ error: 'User not found' });
-    }
+    if (!user) return res.status(400).json({ error: 'User not found' });
     if (!user.isActive) return res.status(400).json({ error: 'Your account has been deactivated. Contact admin.' });
-
-    if (user.role.name === 'ADMIN') {
-      return res.status(400).json({ error: 'Admins cannot use OTP' });
-    }
+    if (user.role.name === 'ADMIN') return res.status(400).json({ error: 'Admins cannot use OTP login' });
 
     const code = Math.floor(100000 + Math.random() * 900000).toString();
     const expiresAt = new Date(Date.now() + 10 * 60 * 1000);
 
+    // Store OTP using email as key — use mobile field as identifier
     await prisma.otp.upsert({
-      where: { mobile },
-      update: { code, expiresAt }, 
-      create: { mobile, code, expiresAt },
+      where: { mobile: email },
+      update: { code, expiresAt },
+      create: { mobile: email, code, expiresAt },
     });
 
-    console.log(`OTP for ${mobile}: ${code}`); 
+    await sendEmailOtp(email, code);
+    console.log(`OTP for ${email}: ${code}`); // fallback log
 
-    return res.json({ message: 'OTP sent' });
+    return res.json({ message: 'OTP sent to your email' });
   } catch (err: any) {
     logger.error('Send OTP error:', err.message);
     return res.status(500).json({ error: 'Failed to send OTP' });
@@ -82,38 +80,23 @@ const sendOtp = async (req: Request, res: Response) => {
 
 const verifyOtp = async (req: Request, res: Response) => {
   try {
-    const { mobile, code } = req.body;
+    const { email, code } = req.body;
 
-    console.log('=== DEBUG ===');
-    console.log('mobile:', JSON.stringify(mobile));
-    console.log('code received:', JSON.stringify(code));
+    const otp = await prisma.otp.findFirst({ where: { mobile: email } });
 
-    const otp = await prisma.otp.findFirst({ where: { mobile } });
-
-    console.log('otp found:', otp);
-    console.log('=== END DEBUG ===');
-
-    if (!otp) {
-      return res.status(400).json({ error: 'OTP not found for this mobile' });
-    }
-
-    if (otp.code?.trim() !== code?.toString().trim()) {
-      return res.status(400).json({ error: `Code mismatch - DB: ${otp.code} | Received: ${code}` });
-    }
-
-    if (otp.expiresAt && otp.expiresAt < new Date()) {
-      return res.status(400).json({ error: 'OTP expired' });
-    }
+    if (!otp) return res.status(400).json({ error: 'OTP not found. Please request again.' });
+    if (otp.code?.trim() !== code?.toString().trim()) return res.status(400).json({ error: 'Invalid OTP' });
+    if (otp.expiresAt && otp.expiresAt < new Date()) return res.status(400).json({ error: 'OTP expired' });
 
     const user = await prisma.user.findFirst({
-      where: { mobile },
+      where: { email },
       include: { role: true }
     });
 
     if (!user) return res.status(400).json({ error: 'User not found' });
-    if (user.role.name === 'ADMIN') return res.status(400).json({ error: 'Admin cannot use OTP' });
+    if (user.role.name === 'ADMIN') return res.status(400).json({ error: 'Admin cannot use OTP login' });
 
-    await prisma.otp.delete({ where: { mobile } });
+    await prisma.otp.delete({ where: { mobile: email } });
 
     const token = jwt.sign(
       { id: user.id, role: user.role.name },
@@ -123,7 +106,7 @@ const verifyOtp = async (req: Request, res: Response) => {
 
     return res.json({
       token,
-      user: { id: user.id, mobile: user.mobile, name: user.name, role: user.role.name }
+      user: { id: user.id, email: user.email, mobile: user.mobile, name: user.name, role: user.role.name }
     });
 
   } catch (err: any) {

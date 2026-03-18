@@ -24,11 +24,11 @@ const registerSchema = z.object({
 
 
 const sendOtpSchema = z.object({
-  mobile: mobileSchema,
+  email: z.string().email('Invalid email format'),
 }).strict();
 
 const verifyOtpSchema = z.object({
-  mobile: mobileSchema,
+  email: z.string().email('Invalid email format'),
   code: z.string().length(6, 'OTP must be 6 digits'),
 }).strict();
 
