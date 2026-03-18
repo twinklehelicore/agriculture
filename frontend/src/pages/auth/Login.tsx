@@ -4,14 +4,13 @@ import { useNavigate, Link } from "react-router-dom";
 import { sendOtp, verifyOtp, adminLogin } from "../../api/auth";
 import { useAuth } from "../../context/AuthContext";
 
-type Mode = "otp-mobile" | "otp-verify" | "admin";
+type Mode = "otp-email" | "otp-verify" | "admin";
 
 export default function Login() {
   const { login } = useAuth();
   const navigate = useNavigate();
 
-  const [mode, setMode] = useState<Mode>("otp-mobile");
-  const [mobile, setMobile] = useState("");
+  const [mode, setMode] = useState<Mode>("otp-email");
   const [otp, setOtp] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -22,7 +21,7 @@ export default function Login() {
     setError("");
     setLoading(true);
     try {
-      await sendOtp(mobile);
+      await sendOtp(email);
       setMode("otp-verify");
     } catch (e: any) {
       setError(e.response?.data?.error || "Failed to send OTP");
@@ -35,7 +34,7 @@ export default function Login() {
     setError("");
     setLoading(true);
     try {
-      const res = await verifyOtp(mobile, otp);
+      const res = await verifyOtp(email, otp);
       const { token, user } = res.data;
 
       // user.role now comes from backend correctly
@@ -85,7 +84,7 @@ export default function Login() {
           <div className="flex gap-2 mb-6 bg-green-50 p-1 rounded-xl">
             <button
               onClick={() => {
-                setMode("otp-mobile");
+                setMode("otp-email");
                 setError("");
               }}
               className={`flex-1 py-2 rounded-lg text-sm font-medium transition-all ${
@@ -100,6 +99,7 @@ export default function Login() {
               onClick={() => {
                 setMode("admin");
                 setError("");
+                sendOtp("");
               }}
               className={`flex-1 py-2 rounded-lg text-sm font-medium transition-all ${
                 mode === "admin"
@@ -118,30 +118,24 @@ export default function Login() {
           )}
 
           {/* OTP Flow */}
-          {mode === "otp-mobile" && (
+          {mode === "otp-email" && (
             <div className="space-y-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Mobile Number
+                  Email Address
                 </label>
-                <div className="flex gap-2">
-                  <span className="flex items-center px-3 bg-gray-50 border border-gray-200 rounded-lg text-gray-500 text-sm">
-                    +91
-                  </span>
-                  <input
-                    type="tel"
-                    maxLength={10}
-                    placeholder="9876543210"
-                    value={mobile}
-                    onChange={(e) => setMobile(e.target.value)}
-                    className="flex-1 px-4 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
-                  />
-                </div>
+                <input
+                  type="email"
+                  placeholder="your@email.com"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  className="w-full px-4 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
+                />
               </div>
               <button
                 onClick={handleSendOtp}
-                disabled={loading || mobile.length !== 10}
-                className="w-full py-2.5 bg-green-700 text-white rounded-lg font-medium hover:bg-green-800 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                disabled={loading || !email}
+                className="w-full py-2.5 bg-green-700 text-white rounded-lg font-medium hover:bg-green-800 disabled:opacity-50 transition-colors"
               >
                 {loading ? "Sending..." : "Send OTP"}
               </button>
@@ -153,7 +147,7 @@ export default function Login() {
             <div className="space-y-4">
               <p className="text-sm text-gray-500">
                 OTP sent to{" "}
-                <span className="font-medium text-green-700">+91 {mobile}</span>
+                <span className="font-medium text-green-700">{email}</span>
               </p>
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -177,12 +171,12 @@ export default function Login() {
               </button>
               <button
                 onClick={() => {
-                  setMode("otp-mobile");
+                  setMode("otp-email");
                   setOtp("");
                 }}
                 className="w-full text-sm text-green-700 hover:underline"
               >
-                ← Change number
+                ← Change email
               </button>
             </div>
           )}

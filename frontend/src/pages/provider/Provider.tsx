@@ -65,9 +65,7 @@ export default function ProviderLayout() {
             <p className="text-white text-sm font-medium truncate">
               {user?.name ?? "Provider"}
             </p>
-            <p className="text-green-400 text-xs truncate">
-              {user?.mobile ?? ""}
-            </p>
+            
           </div>
         </div>
         <button
