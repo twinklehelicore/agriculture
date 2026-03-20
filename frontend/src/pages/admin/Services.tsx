@@ -1,11 +1,5 @@
 import { useEffect, useState } from "react";
-import {
-  getServices,
-  createService,
-  updateService,
-  deleteService,
-  getCategories,
-} from "../../api/admin";
+import { getServices, createService, updateService, deleteService, getCategories } from "../../api/admin";
 
 interface Service {
   id: number;

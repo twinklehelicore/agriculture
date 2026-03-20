@@ -41,8 +41,6 @@ export default function AppRouter() {
           <Route path= "track" element= { <TrackService /> } />
           <Route path="categories" element={<Categories />} />
 
-
-
         </Route>
 
         <Route path="/farmer" element={<ProtectedRoute role="FARMER"><FarmerLayout /></ProtectedRoute>}>

@@ -35,7 +35,7 @@ export default function Register() {
             <span className="text-3xl">✅</span>
           </div>
           <h2 className="text-xl font-bold text-green-800 mb-2">Registered!</h2>
-          <p className="text-gray-500 mb-6">Your account has been created. Login with your mobile number.</p>
+          <p className="text-gray-500 mb-6">Your account has been created. Login with your email.</p>
           <button
             onClick={() => navigate('/login')}
             className="w-full py-2.5 bg-green-700 text-white rounded-lg font-medium hover:bg-green-800 transition-colors"
@@ -101,7 +101,7 @@ export default function Register() {
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Email <span className="text-gray-400">(optional)</span></label>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Email *</label>
             <input name="email" type="email" placeholder="you@example.com" onChange={handleChange}
               className="w-full px-4 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500" />
           </div>
@@ -114,7 +114,7 @@ export default function Register() {
 
           <button
             onClick={handleSubmit}
-            disabled={loading || !form.name || !form.mobile}
+            disabled={loading || !form.name || !form.mobile || !form.email}
             className="w-full py-2.5 bg-green-700 text-white rounded-lg font-medium hover:bg-green-800 disabled:opacity-50 transition-colors"
           >
             {loading ? 'Registering...' : 'Create Account'}

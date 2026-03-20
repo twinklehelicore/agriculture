@@ -2,6 +2,7 @@ import { useState } from "react";
 import { NavLink, Outlet, useNavigate } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
 import NotificationBell from "../../components/NotificationBell";
+import AgriChat from '../../components/AgriChat';
 
 const navItems = [
   { to: "/farmer", label: "Home", icon: "🏠", end: true },
@@ -92,7 +93,9 @@ export default function FarmerLayout() {
         <div
           className="fixed inset-0 bg-black/50 z-20 lg:hidden"
           onClick={() => setSidebarOpen(false)}
+          
         />
+        
       )}
 
       {/* Desktop sidebar */}
@@ -149,6 +152,7 @@ export default function FarmerLayout() {
           <Outlet />
         </main>
       </div>
+      <AgriChat />
     </div>
   );
 }
